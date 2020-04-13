@@ -1,29 +1,17 @@
-# Your First Progressive Web App Codelab
+# Minecraft Cords PWA
 
-These are the resource files needed for the
-[Your First Progressive Web App][codelab] codelab.
+This app is for logging minecraft cordinates and data about them.
+It was pased on [Your First Progressive Web App][codelab] codelab and then heavily modified.
+It utilizes [The Ink & Parchment Map][map] to render the waypoints and display a map.
+It also uses the Dropbox API to save and load data.
 
-In this codelab, you'll  build a weather web app using Progressive Web App
-techniques. Your app will:
-
+Since it is a PWA it will:
 * Use responsive design, so it works on desktop or mobile.
 * Be fast & reliable, using a service worker to precache the app resources
   (HTML, CSS, JavaScript, images) needed to run, and cache the weather data
   at runtime to improve performance.
 * Be installable, using a web app manifest and the `beforeinstallprompt` event
   to notify the user it's installable.
-
-
-## What you'll learn
-
-* How to create and add a web app manifest
-* How to provide a simple offline experience
-* How to provide a full offline experience
-* How to make your app installable
-
-## Getting started
-
-To get started, check out the [codelab instruction][codelab]
 
 
 ## Feedback
@@ -51,4 +39,5 @@ specific language governing permissions and limitations under the License.
 
 
 [codelab]: https://codelabs.developers.google.com/codelabs/your-first-pwapp/
-[git-issue]: https://github.com/googlecodelabs/your-first-pwapp/issues
+[map]: http://buildingwithblocks.info/
+[git-issue]: https://github.com/MusicMonkey5555/minecraft-cords/issues
