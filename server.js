@@ -30,32 +30,32 @@ const API_KEY = process.env.DARKSKY_API_KEY;
 const BASE_URL = `https://api.darksky.net/forecast`;
 
 const LocationTypes = [
-	{name: "Spawn", 			description: "", icon: "" },
-	{name: "PlayerHouse", 		description: "", icon: "" },
-	{name: "PlayerCastle", 		description: "", icon: "" },
-	{name: "PlayerFarm", 		description: "", icon: "" },
-	{name: "PlayerMachine", 	description: "", icon: "" },
-	{name: "PlayerStructure", 	description: "a generic catch-all block for things players have built that defy any more specific icons.", icon: "" },
-	{name: "EnchantingRoom", 	description: "", icon: "" },
-	{name: "Village", 			description: "", icon: "" },
-	{name: "DesertVillage", 	description: "", icon: "" },
-	{name: "SavannahVillage", 	description: "", icon: "" },
-	{name: "JungleTemple", 		description: "", icon: "" },
-	{name: "DesertTemple", 		description: "", icon: "" },
-	{name: "WitchHut", 			description: "", icon: "" },
-	{name: "NetherFortress", 	description: "", icon: "" },
-	{name: "NetherPortal", 		description: "", icon: "" },
-	{name: "Forest", 			description: "", icon: "" },
-	{name: "FlowerForest", 		description: "", icon: "" },
-	{name: "MushroomIsland", 	description: "", icon: "" },
-	{name: "Horse", 			description: "", icon: "" },
-	{name: "Wolf", 				description: "", icon: "" },
-	{name: "Dragon", 			description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", icon: "" },
-	{name: "SeaMonster", 		description: "", icon: "" },
-	{name: "Ship", 				description: "a sailing ship. You can use it to decorate the map and indicate ocean.", icon: "" },
-	{name: "FenceOverlay", 		description: "", icon: "" },
-	{name: "IslandOverlay", 	description: "", icon: "" },
-	{name: "Label", 			description: "a location-type that has no icon by default, you can use it to place plain text onto the map.", icon: "" }
+	{ name: "Spawn",           description: "",                                                                                                                   icon: "" },
+	{ name: "PlayerHouse",     description: "",                                                                                                                   icon: "" },
+	{ name: "PlayerCastle",    description: "",                                                                                                                   icon: "" },
+	{ name: "PlayerFarm",      description: "",                                                                                                                   icon: "" },
+	{ name: "PlayerMachine",   description: "",                                                                                                                   icon: "" },
+	{ name: "PlayerStructure", description: "a generic catch-all block for things players have built that defy any more specific icons.",                         icon: "" },
+	{ name: "EnchantingRoom",  description: "",                                                                                                                   icon: "" },
+	{ name: "Village",         description: "",                                                                                                                   icon: "" },
+	{ name: "DesertVillage",   description: "",                                                                                                                   icon: "" },
+	{ name: "SavannahVillage", description: "",                                                                                                                   icon: "" },
+	{ name: "JungleTemple",    description: "",                                                                                                                   icon: "" },
+	{ name: "DesertTemple",    description: "",                                                                                                                   icon: "" },
+	{ name: "WitchHut",        description: "",                                                                                                                   icon: "" },
+	{ name: "NetherFortress",  description: "",                                                                                                                   icon: "" },
+	{ name: "NetherPortal",    description: "",                                                                                                                   icon: "" },
+	{ name: "Forest",          description: "",                                                                                                                   icon: "" },
+	{ name: "FlowerForest",    description: "",                                                                                                                   icon: "" },
+	{ name: "MushroomIsland",  description: "",                                                                                                                   icon: "" },
+	{ name: "Horse",           description: "",                                                                                                                   icon: "" },
+	{ name: "Wolf",            description: "",                                                                                                                   icon: "" },
+	{ name: "Dragon",          description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", icon: "" },
+	{ name: "SeaMonster",      description: "",                                                                                                                   icon: "" },
+	{ name: "Ship",            description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             icon: "" },
+	{ name: "FenceOverlay",    description: "",                                                                                                                   icon: "" },
+	{ name: "IslandOverlay",   description: "",                                                                                                                   icon: "" },
+	{ name: "Label",           description: "a location-type that has no icon by default , you can use it to place plain text onto the map.",                     icon: "" }
 ];
 
 const IconClasses = [
@@ -111,29 +111,19 @@ const IconClasses = [
 
 //
 const fakeData = {
-  fakeData: true,
-  type: 'Chest',
-  x: 0,
-  y: 0,
-  z: 0,
-  description: 'Some cool chest',
-  owner: 'Nathan',
-  link: '',
-  iconIndex: 43
+	fakeData: true,
+	type: 'Chest',
+	x: 0,
+	y: 0,
+	z: 0,
+	description: 'Some cool chest',
+	owner: 'Nathan',
+	link: '',
+	iconIndex: 43
 };
 
 // Fake forecast data used if we can't reach the Dark Sky API
-const fakeForecast = {
-  fakeData: true,
-  type: 'Chest',
-  x: 0,
-  y: 0,
-  z: 0,
-  description: 'Some cool chest',
-  owner: 'Nathan',
-  link: '',
-  iconIndex: 43,
-  
+const fakeForecast = {  
   latitude: 0,
   longitude: 0,
   timezone: 'America/New_York',
@@ -275,6 +265,10 @@ function getForecast(req, resp) {
     console.error('Dark Sky API Error:', err.message);
     resp.json(generateFakeForecast(location));
   });
+}
+
+function getDataFile(req, resp){
+
 }
 
 /**
