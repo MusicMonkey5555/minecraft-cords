@@ -1,7 +1,7 @@
 {
-  "name": "your-first-pwapp",
+  "name": "mine-cords",
   "version": "2.0.0",
-  "description": "Codelab for Your First PWAPP",
+  "description": "Minecraft cordinates PWAPP",
   "homepage": "https://codelabs.developers.google.com/codelabs/your-first-pwapp/",
   "main": "server.js",
   "scripts": {
@@ -17,15 +17,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/googlecodelabs/your-first-pwapp.git"
+    "url": "https://github.com/MusicMonkey5555/minecraft-cords.git"
   },
   "bugs": {
-    "url": "https://github.com/googlecodelabs/your-first-pwapp/issues"
+    "url": "https://github.com/MusicMonkey5555/minecraft-cords/issues"
   },
   "license": "Apache2",
   "keywords": [
     "progressive-web-app",
     "pwa",
-    "installable web app"
+	"installable web app",
+	"mincraft",
+	"coordinates"
   ]
 }
