@@ -17,7 +17,7 @@
  */
 'use strict';
 
-const weatherApp = {
+const minecordApp = {
   selectedLocations: {},
   addDialogContainer: document.getElementById('addDialogContainer'),
 };
@@ -26,7 +26,7 @@ const weatherApp = {
  * Toggles the visibility of the add location dialog box.
  */
 function toggleAddDialog() {
-  weatherApp.addDialogContainer.classList.toggle('visible');
+  minecordApp.addDialogContainer.classList.toggle('visible');
 }
 
 /**
@@ -35,20 +35,37 @@ function toggleAddDialog() {
 function addLocation() {
   // Hide the dialog
   toggleAddDialog();
-  // Get the selected city
-  const select = document.getElementById('selectCityToAdd');
-  const selected = select.options[select.selectedIndex];
-  const geo = selected.value;
-  const label = selected.textContent;
-  const location = {label: label, geo: geo};
+
+  // Get the selected type
+  const selectType = document.getElementById('selectLocationType');
+  const selectedType = selectType.options[selectType.selectedIndex];
+  const type = selectedType.value;
+  //const label = selectedType.textContent;
+
+  //Get all the input fields
+  const xCord = document.getElementById('xCord');
+  const yCord = document.getElementById('yCord');
+  const zCord = document.getElementById('zCord');
+  const description = document.getElementById('description-input');
+  const owner = document.getElementById('owner-input');
+  const url = document.getElementById('url-input');
+
+  //Get the icon dropdown
+  const selectIcon = document.getElementById('select-icon');
+  const selectedIcon = selectIcon.options[selectIcon.selectedIndex];
+  const iconIndex = selectedIcon.value;
+
+  //Set all the data about a location
+  const location = {type: type, x: xCord.value, y: yCord.value, z: zCord.value, description: description.value, owner: owner.value, url: url.value, iconIndex: iconIndex };
+  
   // Create a new card & get the weather data from the server
-  const card = getForecastCard(location);
-  getForecastFromNetwork(geo).then((forecast) => {
+  const card = getItemCard(location);
+  getForecastFromNetwork(type).then((forecast) => {
     renderForecast(card, forecast);
   });
   // Save the updated list of selected cities.
-  weatherApp.selectedLocations[geo] = location;
-  saveLocationList(weatherApp.selectedLocations);
+  minecordApp.selectedLocations[type] = location;
+  saveLocationList(minecordApp.selectedLocations);
 }
 
 /**
@@ -59,9 +76,9 @@ function addLocation() {
 function removeLocation(evt) {
   const parent = evt.srcElement.parentElement;
   parent.remove();
-  if (weatherApp.selectedLocations[parent.id]) {
-    delete weatherApp.selectedLocations[parent.id];
-    saveLocationList(weatherApp.selectedLocations);
+  if (minecordApp.selectedLocations[parent.id]) {
+    delete minecordApp.selectedLocations[parent.id];
+    saveLocationList(minecordApp.selectedLocations);
   }
 }
 
@@ -169,21 +186,29 @@ function getForecastFromCache(coords) {
 }
 
 /**
- * Get's the HTML element for the weather forecast, or clones the template
+ * Get's the HTML element for the x-y-z data, or clones the template
  * and adds it to the DOM if we're adding a new item.
  *
  * @param {Object} location Location object
- * @return {Element} The element for the weather forecast.
+ * @return {Element} The element for the location card.
  */
-function getForecastCard(location) {
-  const id = location.geo;
+function getItemCard(location) {
+  const id = location.x + "|" + location.y + "" + location.z;
   const card = document.getElementById(id);
   if (card) {
     return card;
   }
   const newCard = document.getElementById('item-template').cloneNode(true);
-  newCard.querySelector('.location').textContent = location.label;
+  newCard.querySelector('.location').textContent = location.x + "," + location.y + "," + location.z;
   newCard.setAttribute('id', id);
+
+  //fill out the other data
+  newCard.querySelector('.description').textContent = location.description;
+  newCard.querySelector('.owner').textContent = location.owner;
+  newCard.querySelector('.loc-type').textContent = location.type;
+  newCard.querySelector('.url').textContent = location.url;
+  newCard.querySelector('.icon-index').textContent = location.iconIndex;
+
   newCard.querySelector('.remove-item')
       .addEventListener('click', removeLocation);
   document.querySelector('main').appendChild(newCard);
@@ -196,9 +221,9 @@ function getForecastCard(location) {
  * new data.
  */
 function updateData() {
-  Object.keys(weatherApp.selectedLocations).forEach((key) => {
-    const location = weatherApp.selectedLocations[key];
-    const card = getForecastCard(location);
+  Object.keys(minecordApp.selectedLocations).forEach((key) => {
+    const location = minecordApp.selectedLocations[key];
+    const card = getItemCard(location);
     // CODELAB: Add code to call getForecastFromCache
 
     // Get the forecast data from the network.
@@ -247,7 +272,7 @@ function loadLocationList() {
  */
 function init() {
   // Get the location list, and update the UI.
-  weatherApp.selectedLocations = loadLocationList();
+  minecordApp.selectedLocations = loadLocationList();
   updateData();
 
   // Set up the event handlers for all of the buttons.

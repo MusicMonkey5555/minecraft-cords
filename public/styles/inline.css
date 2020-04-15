@@ -599,7 +599,7 @@ body {
   padding-top: 20px;
 }
 
-.dialog-body select {
+.dialog-body select,input,textarea {
   width: 100%;
 }
 
@@ -644,19 +644,24 @@ body {
   font-size: 1.75em;
 }
 
-.item-card .date,
+.item-card .owner,
 .item-card .description {
   font-size: 1.25em;
 }
 
-.item-card .current {
+.item-card .info {
   display: flex;
 }
 
-.item-card .current .icon {
+.item-card .info .loc-type {
   height: 128px;
   width: 128px;
 }
+
+.item-card .info .icon-index{
+	height: 128px;
+	width: 128px;
+  }
 
 .item-card .current .visual {
   display: flex;

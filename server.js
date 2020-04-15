@@ -23,11 +23,11 @@ const fetch = require('node-fetch');
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
 // CODELAB: Change this to add a delay (ms) before the server responds.
-const FORECAST_DELAY = 0;
+const LOAD_DELAY = 0;
 
 // CODELAB: If running locally, set your Dark Sky API key here
-const API_KEY = process.env.DARKSKY_API_KEY;
-const BASE_URL = `https://api.darksky.net/forecast`;
+const API_KEY = process.env.DROPBOX_API_KEY;
+const BASE_URL = `https://api.dropboxapi.com/2/`;
 
 const LocationTypes = [
 	{ name: "Spawn",           description: "",                                                                                                                   icon: "" },
@@ -260,15 +260,34 @@ function getForecast(req, resp) {
   }).then((data) => {
     setTimeout(() => {
       resp.json(data);
-    }, FORECAST_DELAY);
+    }, LOAD_DELAY);
   }).catch((err) => {
     console.error('Dark Sky API Error:', err.message);
     resp.json(generateFakeForecast(location));
   });
 }
 
+/**
+ * Get the data file for our minecraft cordinates
+ * @param {Request} req request object from Express
+ * @param {Response} resp response object from Express
+ */
 function getDataFile(req, resp){
-
+	const location = req.params.location || '-1223,60,-1538';
+	const url = `${BASE_URL}/${API_KEY}/${location}`;
+	fetch(url).then((resp) => {
+		if (resp.status !== 200) {
+			throw new Error(resp.statusText);
+		}
+		return resp.json();
+	}).then((data) => {
+		setTimeout(() => {
+			resp.json(data);
+		}, LOAD_DELAY);
+	}).catch((err) => {
+		console.error('Dropbox API Error:', err.message);
+		resp.json(generateFakeData(location));
+	});
 }
 
 /**
