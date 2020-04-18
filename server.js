@@ -29,35 +29,65 @@ const LOAD_DELAY = 0;
 const API_KEY = process.env.DROPBOX_API_KEY;
 const BASE_URL = `https://api.dropboxapi.com/2/`;
 
-const LocationTypes = [
-	{ name: "Spawn",           description: "",                                                                                                                   icon: "" },
-	{ name: "PlayerHouse",     description: "",                                                                                                                   icon: "" },
-	{ name: "PlayerCastle",    description: "",                                                                                                                   icon: "" },
-	{ name: "PlayerFarm",      description: "",                                                                                                                   icon: "" },
-	{ name: "PlayerMachine",   description: "",                                                                                                                   icon: "" },
-	{ name: "PlayerStructure", description: "a generic catch-all block for things players have built that defy any more specific icons.",                         icon: "" },
-	{ name: "EnchantingRoom",  description: "",                                                                                                                   icon: "" },
-	{ name: "Village",         description: "",                                                                                                                   icon: "" },
-	{ name: "DesertVillage",   description: "",                                                                                                                   icon: "" },
-	{ name: "SavannahVillage", description: "",                                                                                                                   icon: "" },
-	{ name: "JungleTemple",    description: "",                                                                                                                   icon: "" },
-	{ name: "DesertTemple",    description: "",                                                                                                                   icon: "" },
-	{ name: "WitchHut",        description: "",                                                                                                                   icon: "" },
-	{ name: "NetherFortress",  description: "",                                                                                                                   icon: "" },
-	{ name: "NetherPortal",    description: "",                                                                                                                   icon: "" },
-	{ name: "Forest",          description: "",                                                                                                                   icon: "" },
-	{ name: "FlowerForest",    description: "",                                                                                                                   icon: "" },
-	{ name: "MushroomIsland",  description: "",                                                                                                                   icon: "" },
-	{ name: "Horse",           description: "",                                                                                                                   icon: "" },
-	{ name: "Wolf",            description: "",                                                                                                                   icon: "" },
-	{ name: "Dragon",          description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", icon: "" },
-	{ name: "SeaMonster",      description: "",                                                                                                                   icon: "" },
-	{ name: "Ship",            description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             icon: "" },
-	{ name: "FenceOverlay",    description: "",                                                                                                                   icon: "" },
-	{ name: "IslandOverlay",   description: "",                                                                                                                   icon: "" },
-	{ name: "Label",           description: "a location-type that has no icon by default , you can use it to place plain text onto the map.",                     icon: "" }
-];
+//Fake data used as a template
+const fakeData = {
+	fakeData: true,
+	native: true,
+	filename: "fakeCords.json",
+	title: "My awesome map",
+	locations: [
+		{
+			time: 0,
+			timezone: 'utc',
+			type: 'Chest',
+			x: 0,
+			y: 0,
+			z: 0,
+			description: 'Some cool fake chest',
+			owner: 'User',
+			link: '',
+			iconIndex: 43
+		}
+	]
+};
 
+//Static data
+
+/**
+ * Location type data
+ */
+const LocationTypes = {
+	"Spawn":           { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerHouse":     { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerCastle":    { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerFarm":      { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerMachine":   { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerStructure": { description: "a generic catch-all block for things players have built that defy any more specific icons.",                         iconIndex: -1 },
+	"EnchantingRoom":  { description: "",                                                                                                                   iconIndex: -1 },
+	"Village":         { description: "",                                                                                                                   iconIndex: -1 },
+	"DesertVillage":   { description: "",                                                                                                                   iconIndex: 1 },
+	"SavannahVillage": { description: "",                                                                                                                   iconIndex: 0 },
+	"JungleTemple":    { description: "",                                                                                                                   iconIndex: -1 },
+	"DesertTemple":    { description: "",                                                                                                                   iconIndex: -1 },
+	"WitchHut":        { description: "",                                                                                                                   iconIndex: -1 },
+	"NetherFortress":  { description: "",                                                                                                                   iconIndex: -1 },
+	"NetherPortal":    { description: "",                                                                                                                   iconIndex: -1 },
+	"Forest":          { description: "",                                                                                                                   iconIndex: -1 },
+	"FlowerForest":    { description: "",                                                                                                                   iconIndex: -1 },
+	"MushroomIsland":  { description: "",                                                                                                                   iconIndex: -1 },
+	"Horse":           { description: "",                                                                                                                   iconIndex: -1 },
+	"Wolf":            { description: "",                                                                                                                   iconIndex: -1 },
+	"Dragon":          { description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", iconIndex: -1 },
+	"SeaMonster":      { description: "",                                                                                                                   iconIndex: -1 },
+	"Ship":            { description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             iconIndex: -1 },
+	"FenceOverlay":    { description: "",                                                                                                                   iconIndex: -1 },
+	"IslandOverlay":   { description: "",                                                                                                                   iconIndex: -1 },
+	"Label":	       { description: "a location-type that has no icon by default , you can use it to place plain text onto the map.",                     iconIndex: -1 }
+};
+
+/**
+ * These all correspond to the icon css class and the index in the array to the icon-index on https://buildingwithblocks.info/map173/index.html?src=legend.txt
+ */
 const IconClasses = [
   "SavannahVillage",
   "DesertVillage",
@@ -109,106 +139,8 @@ const IconClasses = [
   "Anvil"
 ];
 
-//
-const fakeData = {
-	fakeData: true,
-	type: 'Chest',
-	x: 0,
-	y: 0,
-	z: 0,
-	description: 'Some cool chest',
-	owner: 'Nathan',
-	link: '',
-	iconIndex: 43
-};
-
-// Fake forecast data used if we can't reach the Dark Sky API
-const fakeForecast = {  
-  latitude: 0,
-  longitude: 0,
-  timezone: 'America/New_York',
-  currently: {
-    time: 0,
-    summary: 'Clear',
-    icon: 'clear-day',
-    type: 'Chest',
-    temperature: 43.4,
-    humidity: 0.62,
-    windSpeed: 3.74,
-    windBearing: 208,
-  },
-  daily: {
-    data: [
-      {
-        time: 0,
-        icon: 'partly-cloudy-night',
-        sunriseTime: 1553079633,
-        sunsetTime: 1553123320,
-        temperatureHigh: 52.91,
-        temperatureLow: 41.35,
-      },
-      {
-        time: 86400,
-        icon: 'rain',
-        sunriseTime: 1553165933,
-        sunsetTime: 1553209784,
-        temperatureHigh: 48.01,
-        temperatureLow: 44.17,
-      },
-      {
-        time: 172800,
-        icon: 'rain',
-        sunriseTime: 1553252232,
-        sunsetTime: 1553296247,
-        temperatureHigh: 50.31,
-        temperatureLow: 33.61,
-      },
-      {
-        time: 259200,
-        icon: 'partly-cloudy-night',
-        sunriseTime: 1553338532,
-        sunsetTime: 1553382710,
-        temperatureHigh: 46.44,
-        temperatureLow: 33.82,
-      },
-      {
-        time: 345600,
-        icon: 'partly-cloudy-night',
-        sunriseTime: 1553424831,
-        sunsetTime: 1553469172,
-        temperatureHigh: 60.5,
-        temperatureLow: 43.82,
-      },
-      {
-        time: 432000,
-        icon: 'rain',
-        sunriseTime: 1553511130,
-        sunsetTime: 1553555635,
-        temperatureHigh: 61.79,
-        temperatureLow: 32.8,
-      },
-      {
-        time: 518400,
-        icon: 'rain',
-        sunriseTime: 1553597430,
-        sunsetTime: 1553642098,
-        temperatureHigh: 48.28,
-        temperatureLow: 33.49,
-      },
-      {
-        time: 604800,
-        icon: 'snow',
-        sunriseTime: 1553683730,
-        sunsetTime: 1553728560,
-        temperatureHigh: 43.58,
-        temperatureLow: 33.68,
-      },
-    ],
-  },
-};
-
 /**
- * Generates a fake data in case the file is not available.
+ * Generates fake data in case the file is not available.
  *
  * @param {String} location x,y,z location to use.
  * @return {Object} data object.
@@ -217,54 +149,115 @@ function generateFakeData(location){
   location = location || '-1223,60,-1538';
   const cords = location.split(',', 3);
   
-  // Create a new copy of the forecast
+  // Create a new copy of the fake data
   const result = Object.assign({}, fakeData);
-  result.x = parseFloat(cords[0].trim());
-  result.y = parseFloat(cords[1].trim());
-  result.z = parseFloat(cords[2].trim());
+  result.locations[0].x = parseFloat(cords[0].trim());
+  result.locations[0].y = parseFloat(cords[1].trim());
+  result.locations[0].z = parseFloat(cords[2].trim());
   return result;
 }
 
 /**
- * Generates a fake forecast in case the weather API is not available.
- *
- * @param {String} location GPS location to use.
- * @return {Object} forecast object.
+ * Read in a file from dropbox and convert it to something we can use
+ * @param {Object} fileData File data object from dropbox to be converted to something we can use
+ * @returns {Object} Object in correct format to use in our application
  */
-function generateFakeForecast(location) {
-  location = location || '40.7720232,-73.9732319';
-  const commaAt = location.indexOf(',');
+function readFile(fileData){
 
-  // Create a new copy of the forecast
-  const result = Object.assign({}, fakeForecast);
-  result.latitude = parseFloat(location.substr(0, commaAt));
-  result.longitude = parseFloat(location.substr(commaAt + 1));
-  return result;
+	//Create our object we will populate from the file
+	const result = Object.assign({}, fakeData);
+
+	//Get the template for the location
+	const locationTemplate = Object.assign({}, result.locations[0]);
+	locationTemplate.type = '';
+	locationTemplate.description = '';
+	locationTemplate.iconIndex = -1;
+
+	//Clear out some values
+	result.filename = '';
+	result.fakeData = false;
+	result.native = true;
+	result.locations = [];
+
+	//Check each important property and set any that we have
+	if(title in fileData){
+		result.title = fileData.title;
+	}
+	if(locations in fileData && Array.isArray(fileData.locations) && fileData.locations.length > 0){
+		fileData.locations.forEach(element => {
+			const location = Object.assign({}, locationTemplate);
+			
+			//Validate location data
+			if(time in element){
+				const time = parseInt(element.time);
+				if(time !== NaN){
+					location.time = time;
+				}
+			}
+			if(timezone in element){
+				location.timezone = String(element.timezone);
+			}
+			if(type in element && LocationTypes.hasOwnProperty(element.type)){
+				location.type = element.type;
+			}
+			if(x in element){
+				const x = parseFloat(element.x);
+				if(x !== NaN){
+					location.x = x;
+				}
+			}
+			if(y in element){
+				const y = parseFloat(element.y);
+				if(y !== NaN){
+					location.y = y;
+				}
+			}
+			if(z in element){
+				const z = parseFloat(element.z);
+				if(z !== NaN){
+					location.z = z;
+				}
+			}
+			if(description in element){
+				location.description = String(element.description);
+			}
+			if(owner in element){
+				location.owner = String(element.owner);
+			}
+			if(link in element){
+				location.link = String(element.link);
+			}
+			else if(href in element){
+				location.link = element.href;
+			}
+			if(iconIndex in element){
+				const iconIndex = parseInt(element.iconIndex);
+				if(iconIndex > -1){
+					location.iconIndex = iconIndex;
+				}
+			}
+
+			//Add the location to the list
+			result.locations.push(location);
+		});
+	}
+
+	return result;
 }
 
-
 /**
- * Gets the weather forecast from the Dark Sky API for the given location.
- *
- * @param {Request} req request object from Express.
- * @param {Response} resp response object from Express.
+ * Save application data as a json file
+ * @param {fakeData} data Data formatted in same format as fakeData
  */
-function getForecast(req, resp) {
-  const location = req.params.location || '40.7720232,-73.9732319';
-  const url = `${BASE_URL}/${API_KEY}/${location}`;
-  fetch(url).then((resp) => {
-    if (resp.status !== 200) {
-      throw new Error(resp.statusText);
-    }
-    return resp.json();
-  }).then((data) => {
-    setTimeout(() => {
-      resp.json(data);
-    }, LOAD_DELAY);
-  }).catch((err) => {
-    console.error('Dark Sky API Error:', err.message);
-    resp.json(generateFakeForecast(location));
-  });
+function saveJsonFile(data){
+	const result = Object.assign({}, data);
+
+	//Get rid of unimportant properties
+	delete result.fakeData;
+	delete result.native;
+	delete result.filename;
+
+	return result;
 }
 
 /**
@@ -272,9 +265,9 @@ function getForecast(req, resp) {
  * @param {Request} req request object from Express
  * @param {Response} resp response object from Express
  */
-function getDataFile(req, resp){
-	const location = req.params.location || '-1223,60,-1538';
-	const url = `${BASE_URL}/${API_KEY}/${location}`;
+function getLocations(req, resp){
+	const filename = req.params.filename || '';
+	const url = `${BASE_URL}/${API_KEY}/${filename}`;
 	fetch(url).then((resp) => {
 		if (resp.status !== 200) {
 			throw new Error(resp.statusText);
@@ -282,11 +275,34 @@ function getDataFile(req, resp){
 		return resp.json();
 	}).then((data) => {
 		setTimeout(() => {
-			resp.json(data);
+			resp.json(readFile(data));
 		}, LOAD_DELAY);
 	}).catch((err) => {
 		console.error('Dropbox API Error:', err.message);
-		resp.json(generateFakeData(location));
+		resp.json(generateFakeData("-1,0,-1"));
+	});
+}
+
+/**
+ * Save the data file for our minecraft cordinates
+ * @param {Request} req request object from Express
+ * @param {Response} resp response object from Express
+ */
+function saveLocations(req, resp){
+	const filename = req.params.filename || '';
+	const url = `${BASE_URL}/${API_KEY}/${filename}`;
+	fetch(url).then((resp) => {
+		if (resp.status !== 200) {
+			throw new Error(resp.statusText);
+		}
+		return resp.json();
+	}).then((data) => {
+		setTimeout(() => {
+			resp.json(readFile(data));
+		}, LOAD_DELAY);
+	}).catch((err) => {
+		console.error('Dropbox API Error:', err.message);
+		resp.json(generateFakeData("-1,0,-1"));
 	});
 }
 
@@ -313,9 +329,9 @@ function startServer() {
   });
 
   // Handle requests for the data
-  app.get('/forecast/:location', getForecast);
-  app.get('/forecast/', getForecast);
-  app.get('/forecast', getForecast);
+  app.get('/locations/:filename', getLocations);
+  app.get('/locations', getLocations);
+  app.post('/locations', saveLocations);
 
   // Handle requests for static files
   app.use(express.static('public'));

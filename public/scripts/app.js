@@ -18,9 +18,100 @@
 'use strict';
 
 const minecordApp = {
-  selectedLocations: {},
-  addDialogContainer: document.getElementById('addDialogContainer'),
+	filename: "",
+	title: "",
+	native: true,
+	selectedLocations: {},
+	addDialogContainer: document.getElementById('addDialogContainer'),
 };
+
+//Static data
+
+/**
+ * Location type data
+ */
+const LocationTypes = {
+	"Spawn":           { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerHouse":     { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerCastle":    { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerFarm":      { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerMachine":   { description: "",                                                                                                                   iconIndex: -1 },
+	"PlayerStructure": { description: "a generic catch-all block for things players have built that defy any more specific icons.",                         iconIndex: -1 },
+	"EnchantingRoom":  { description: "",                                                                                                                   iconIndex: -1 },
+	"Village":         { description: "",                                                                                                                   iconIndex: -1 },
+	"DesertVillage":   { description: "",                                                                                                                   iconIndex: 1 },
+	"SavannahVillage": { description: "",                                                                                                                   iconIndex: 0 },
+	"JungleTemple":    { description: "",                                                                                                                   iconIndex: -1 },
+	"DesertTemple":    { description: "",                                                                                                                   iconIndex: -1 },
+	"WitchHut":        { description: "",                                                                                                                   iconIndex: -1 },
+	"NetherFortress":  { description: "",                                                                                                                   iconIndex: -1 },
+	"NetherPortal":    { description: "",                                                                                                                   iconIndex: -1 },
+	"Forest":          { description: "",                                                                                                                   iconIndex: -1 },
+	"FlowerForest":    { description: "",                                                                                                                   iconIndex: -1 },
+	"MushroomIsland":  { description: "",                                                                                                                   iconIndex: -1 },
+	"Horse":           { description: "",                                                                                                                   iconIndex: -1 },
+	"Wolf":            { description: "",                                                                                                                   iconIndex: -1 },
+	"Dragon":          { description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", iconIndex: -1 },
+	"SeaMonster":      { description: "",                                                                                                                   iconIndex: -1 },
+	"Ship":            { description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             iconIndex: -1 },
+	"FenceOverlay":    { description: "",                                                                                                                   iconIndex: -1 },
+	"IslandOverlay":   { description: "",                                                                                                                   iconIndex: -1 },
+	"Label":	       { description: "a location-type that has no icon by default , you can use it to place plain text onto the map.",                     iconIndex: -1 }
+};
+
+/**
+ * These all correspond to the icon css class and the index in the array to the icon-index on https://buildingwithblocks.info/map173/index.html?src=legend.txt
+ */
+const IconClasses = [
+  "SavannahVillage",
+  "DesertVillage",
+  "Skull",
+  "WhitchHut",
+  "JungleTemple",
+  "DesertTemple",
+  "NetherFortress",
+  "NetherPortal",
+  "PlayerStructure",
+  "PlayerCastle",
+  "PlayerHouse",
+  "RailwayStructure",
+  "PlayerMachine",
+  "FenceOverlay",
+  "PlayerFarm",
+  "Chicken",
+  "Pig",
+  "Cow",
+  "Sheep",
+  "Pumpkin",
+  "MonumentSarsenStones",
+  "MonumentObelisk",
+  "MonumentMaoi",
+  "ForestOak",
+  "ForestSampling",
+  "ForestPiratePalms",
+  "ForestFlowerForest",
+  "ForestDark",
+  "Forest",
+  "MushroomIsland",
+  "IslandOverlay",
+  "IcePlainsSpikes",
+  "Mountains1",
+  "Mountains2",
+  "Cave",
+  "Horse",
+  "Wolf",
+  "Dragon",
+  "SeaMonster",
+  "Ship1",
+  "Ship2",
+  "CompassRose",
+  "Spawn",
+  "Marker2",
+  "Marker3",
+  "Chest",
+  "EnchantingRoom",
+  "Anvil"
+];
 
 /**
  * Toggles the visibility of the add location dialog box.
@@ -51,7 +142,7 @@ function addLocation() {
   const url = document.getElementById('url-input');
 
   //Get the icon dropdown
-  const selectIcon = document.getElementById('select-icon');
+  const selectIcon = document.getElementById('selectIconIndex');
   const selectedIcon = selectIcon.options[selectIcon.selectedIndex];
   const iconIndex = selectedIcon.value;
 
@@ -60,11 +151,18 @@ function addLocation() {
   
   // Create a new card & get the weather data from the server
   const card = getItemCard(location);
-  getForecastFromNetwork(type).then((forecast) => {
+
+  renderLocation(card, {time: Date.now()})
+
+  /*
+  getLocationFromNetwork(type).then((forecast) => {
     renderForecast(card, forecast);
   });
-  // Save the updated list of selected cities.
-  minecordApp.selectedLocations[type] = location;
+  */
+
+  // Save the updated list of locations.
+  const key = location.x + "|" + location.y + "|" + location.z;
+  minecordApp.selectedLocations[key] = location;
   saveLocationList(minecordApp.selectedLocations);
 }
 
@@ -83,89 +181,48 @@ function removeLocation(evt) {
 }
 
 /**
- * Renders the forecast data into the card element.
+ * Renders the location data into the card element.
  *
  * @param {Element} card The card element to update.
- * @param {Object} data Weather forecast data to update the element with.
+ * @param {Object} data Locaion data to update the element with.
  */
-function renderForecast(card, data) {
-  if (!data) {
-    // There's no data, skip the update.
-    return;
-  }
+function renderLocation(card, data) {
+	if (!data) {
+		// There's no data, skip the update.
+		return;
+	}
+	// Find out when the element was last updated.
+	const cardLastUpdatedElem = card.querySelector('.card-last-updated');
+	const cardLastUpdated = cardLastUpdatedElem.textContent;
+	const lastUpdated = parseInt(cardLastUpdated);
 
-  // Find out when the element was last updated.
-  const cardLastUpdatedElem = card.querySelector('.card-last-updated');
-  const cardLastUpdated = cardLastUpdatedElem.textContent;
-  const lastUpdated = parseInt(cardLastUpdated);
+	// If the data on the element is newer, skip the update.
+	if (lastUpdated >= data.time) {
+		return;
+	}
+	cardLastUpdatedElem.textContent = data.time;
 
-  // If the data on the element is newer, skip the update.
-  if (lastUpdated >= data.currently.time) {
-    return;
-  }
-  cardLastUpdatedElem.textContent = data.currently.time;
+	const updatedLast = luxon.DateTime
+		.fromSeconds(data.time)
+		.setZone(data.timezone)
+		.toFormat('DDDD t');
+	card.querySelector('.date').textContent = updatedLast;
 
-  // Render the forecast data into the card.
-  card.querySelector('.description').textContent = data.currently.summary;
-  const forecastFrom = luxon.DateTime
-      .fromSeconds(data.currently.time)
-      .setZone(data.timezone)
-      .toFormat('DDDD t');
-  card.querySelector('.date').textContent = forecastFrom;
-  card.querySelector('.current .icon')
-      .className = `icon ${data.currently.icon}`;
-  card.querySelector('.current .loc-type')
-      .className = `loc-type ${data.currently.type}`;
-  card.querySelector('.current .temperature .value')
-      .textContent = Math.round(data.currently.temperature);
-  card.querySelector('.current .humidity .value')
-      .textContent = Math.round(data.currently.humidity * 100);
-  card.querySelector('.current .wind .value')
-      .textContent = Math.round(data.currently.windSpeed);
-  card.querySelector('.current .wind .direction')
-      .textContent = Math.round(data.currently.windBearing);
-  const sunrise = luxon.DateTime
-      .fromSeconds(data.daily.data[0].sunriseTime)
-      .setZone(data.timezone)
-      .toFormat('t');
-  card.querySelector('.current .sunrise .value').textContent = sunrise;
-  const sunset = luxon.DateTime
-      .fromSeconds(data.daily.data[0].sunsetTime)
-      .setZone(data.timezone)
-      .toFormat('t');
-  card.querySelector('.current .sunset .value').textContent = sunset;
-
-  // Render the next 7 days.
-  const futureTiles = card.querySelectorAll('.future .oneday');
-  futureTiles.forEach((tile, index) => {
-    const forecast = data.daily.data[index + 1];
-    const forecastFor = luxon.DateTime
-        .fromSeconds(forecast.time)
-        .setZone(data.timezone)
-        .toFormat('ccc');
-    tile.querySelector('.date').textContent = forecastFor;
-    tile.querySelector('.icon').className = `icon ${forecast.icon}`;
-    tile.querySelector('.temp-high .value')
-        .textContent = Math.round(forecast.temperatureHigh);
-    tile.querySelector('.temp-low .value')
-        .textContent = Math.round(forecast.temperatureLow);
-  });
-
-  // If the loading spinner is still visible, remove it.
-  const spinner = card.querySelector('.card-spinner');
-  if (spinner) {
-    card.removeChild(spinner);
-  }
+	// If the loading spinner is still visible, remove it.
+	const spinner = card.querySelector('.card-spinner');
+	if (spinner) {
+		card.removeChild(spinner);
+	}
 }
 
 /**
- * Get's the latest forecast data from the network.
+ * Get's the latest locations from the network.
  *
- * @param {string} coords Location object to.
- * @return {Object} The weather forecast, if the request fails, return null.
+ * @param {string} fileName filename to get locations from.
+ * @return {Object} The location data, if the request fails, return null.
  */
-function getForecastFromNetwork(coords) {
-  return fetch(`/forecast/${coords}`)
+function getLocationsFromNetwork(fileName) {
+  return fetch(`/locations/${fileName}`)
       .then((response) => {
         return response.json();
       })
@@ -175,14 +232,37 @@ function getForecastFromNetwork(coords) {
 }
 
 /**
- * Get's the cached forecast data from the caches object.
+ * Get's the cached location data from the caches object.
  *
- * @param {string} coords Location object to.
- * @return {Object} The weather forecast, if the request fails, return null.
+ * @param {String} cords Cords of location object to get.
+ * @return {Object} The location data, if the request fails, return null.
  */
-function getForecastFromCache(coords) {
+function getLocationFromCache(cords) {
   // CODELAB: Add code to get weather forecast from the caches object.
 
+}
+
+/**
+ * Get the icon class corresponding to the location type.
+ * This is used to display an icon for a location type
+ * @param {string} locationType Location Type name according to the list here: http://buildingwithblocks.info/index_expanded.html#locationTypes_heading
+ * @returns {string} Css class for icon to display that corresponds to the location type or "" if none found
+ */
+function getLocationTypeIconClass(locationType){
+	//Clean up paramter
+	locationType = (locationType || "").trim();
+
+	//Setup variable to return
+	var iconClass = "";
+
+	if(LocationTypes.hasOwnProperty(locationType)){
+		const type = LocationTypes[locationType];
+		if(type.hasOwnProperty("iconIndex") && type.iconIndex > -1 && type.iconIndex < IconClasses.length){
+			iconClass = IconClasses[type.iconIndex];
+		}
+	}
+
+	return iconClass;
 }
 
 /**
@@ -193,7 +273,7 @@ function getForecastFromCache(coords) {
  * @return {Element} The element for the location card.
  */
 function getItemCard(location) {
-  const id = location.x + "|" + location.y + "" + location.z;
+  const id = location.x + "|" + location.y + "|" + location.z;
   const card = document.getElementById(id);
   if (card) {
     return card;
@@ -205,9 +285,20 @@ function getItemCard(location) {
   //fill out the other data
   newCard.querySelector('.description').textContent = location.description;
   newCard.querySelector('.owner').textContent = location.owner;
-  newCard.querySelector('.loc-type').textContent = location.type;
+
+  const locType = newCard.querySelector('.info .loc-type');
+
+  //Lookup the icon for this location type and set the class on the div
+  locType.textContent = location.type;
+  const locTypeIconClass = getLocationTypeIconClass(location.type);
+  locType.className = `loc-type ${locTypeIconClass}`;
+
   newCard.querySelector('.url').textContent = location.url;
-  newCard.querySelector('.icon-index').textContent = location.iconIndex;
+  
+  const iconIndexDiv = newCard.querySelector('.info .icon-index');
+  iconIndexDiv.textContent = location.iconIndex + " - " + IconClasses[location.iconIndex];
+  const iconIndexClass = IconClasses[location.iconIndex]; 
+  iconIndexDiv.className = `icon-index ${iconIndexClass}`;
 
   newCard.querySelector('.remove-item')
       .addEventListener('click', removeLocation);
@@ -216,8 +307,9 @@ function getItemCard(location) {
   return newCard;
 }
 
+
 /**
- * Gets the latest weather forecast data and updates each card with the
+ * Gets the latest location data and updates each card with the
  * new data.
  */
 function updateData() {
@@ -226,11 +318,14 @@ function updateData() {
     const card = getItemCard(location);
     // CODELAB: Add code to call getForecastFromCache
 
-    // Get the forecast data from the network.
-    getForecastFromNetwork(location.geo)
+	// Get the forecast data from the network.
+	/*
+    getLocationFromNetwork(location.geo)
         .then((forecast) => {
           renderForecast(card, forecast);
-        });
+		});
+		*/
+	renderLocation(card, {time: Date.now()});
   });
 }
 
@@ -259,9 +354,9 @@ function loadLocationList() {
     }
   }
   if (!locations || Object.keys(locations).length === 0) {
-    const key = '40.7720232,-73.9732319';
+    const key = '0|0|0';
     locations = {};
-    locations[key] = {label: 'New York City', geo: '40.7720232,-73.9732319'};
+    locations[key] = {type: Chest, x: 0, y: 0, z: 0, description: "Some cool fake chest", owner: "User", url: "", iconIndex: 43 };
   }
   return locations;
 }
@@ -278,10 +373,8 @@ function init() {
   // Set up the event handlers for all of the buttons.
   document.getElementById('butRefresh').addEventListener('click', updateData);
   document.getElementById('butAdd').addEventListener('click', toggleAddDialog);
-  document.getElementById('butDialogCancel')
-      .addEventListener('click', toggleAddDialog);
-  document.getElementById('butDialogAdd')
-      .addEventListener('click', addLocation);
+  document.getElementById('butDialogCancel').addEventListener('click', toggleAddDialog);
+  document.getElementById('butDialogAdd').addEventListener('click', addLocation);
 }
 
 init();
