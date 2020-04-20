@@ -13,9 +13,10 @@
 			],
 			"program": "${workspaceFolder}\\server.js",
 			"serverReadyAction":{
-				"action": "openExternally",
+				"action": "debugWithChrome",
 				"uriFormat": "http://localhost:%s",
-				"pattern": "Local DevServer Started on port ([0-9]+)"
+				"pattern": "Local DevServer Started on port ([0-9]+)...",
+				"webRoot": "${workspaceFolder}/public"
 			}
 		}
 	]
