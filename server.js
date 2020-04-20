@@ -39,7 +39,7 @@ const fakeData = {
 		{
 			time: 0,
 			timezone: 'utc',
-			type: 'Chest',
+			type: 'WitchHut',
 			x: 0,
 			y: 0,
 			z: 0,
@@ -57,32 +57,32 @@ const fakeData = {
  * Location type data
  */
 const LocationTypes = {
-	"Spawn":           { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerHouse":     { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerCastle":    { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerFarm":      { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerMachine":   { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerStructure": { description: "a generic catch-all block for things players have built that defy any more specific icons.",                         iconIndex: -1 },
-	"EnchantingRoom":  { description: "",                                                                                                                   iconIndex: -1 },
-	"Village":         { description: "",                                                                                                                   iconIndex: -1 },
-	"DesertVillage":   { description: "",                                                                                                                   iconIndex: 1 },
-	"SavannahVillage": { description: "",                                                                                                                   iconIndex: 0 },
-	"JungleTemple":    { description: "",                                                                                                                   iconIndex: -1 },
-	"DesertTemple":    { description: "",                                                                                                                   iconIndex: -1 },
-	"WitchHut":        { description: "",                                                                                                                   iconIndex: -1 },
-	"NetherFortress":  { description: "",                                                                                                                   iconIndex: -1 },
-	"NetherPortal":    { description: "",                                                                                                                   iconIndex: -1 },
-	"Forest":          { description: "",                                                                                                                   iconIndex: -1 },
-	"FlowerForest":    { description: "",                                                                                                                   iconIndex: -1 },
-	"MushroomIsland":  { description: "",                                                                                                                   iconIndex: -1 },
-	"Horse":           { description: "",                                                                                                                   iconIndex: -1 },
-	"Wolf":            { description: "",                                                                                                                   iconIndex: -1 },
-	"Dragon":          { description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", iconIndex: -1 },
-	"SeaMonster":      { description: "",                                                                                                                   iconIndex: -1 },
-	"Ship":            { description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             iconIndex: -1 },
-	"FenceOverlay":    { description: "",                                                                                                                   iconIndex: -1 },
-	"IslandOverlay":   { description: "",                                                                                                                   iconIndex: -1 },
-	"Label":	       { description: "a location-type that has no icon by default , you can use it to place plain text onto the map.",                     iconIndex: -1 }
+	"Spawn":           { description: "",                                                                                                                   iconIndex: 40 },
+	"PlayerHouse":     { description: "",                                                                                                                   iconIndex: 10 },
+	"PlayerCastle":    { description: "",                                                                                                                   iconIndex: 9  },
+	"PlayerFarm":      { description: "",                                                                                                                   iconIndex: 14 },
+	"PlayerMachine":   { description: "",                                                                                                                   iconIndex: 12 },
+	"PlayerStructure": { description: "a generic catch-all block for things players have built that defy any more specific icons.",                         iconIndex: 8  },
+	"EnchantingRoom":  { description: "",                                                                                                                   iconIndex: 44 },
+	"Village":         { description: "",                                                                                                                   iconIndex: 0  },
+	"DesertVillage":   { description: "",                                                                                                                   iconIndex: 1  },
+	"SavannahVillage": { description: "",                                                                                                                   iconIndex: 0  },
+	"JungleTemple":    { description: "",                                                                                                                   iconIndex: 4  },
+	"DesertTemple":    { description: "",                                                                                                                   iconIndex: 5  },
+	"WitchHut":        { description: "",                                                                                                                   iconIndex: 3  },
+	"NetherFortress":  { description: "",                                                                                                                   iconIndex: 6  },
+	"NetherPortal":    { description: "",                                                                                                                   iconIndex: 7  },
+	"Forest":          { description: "",                                                                                                                   iconIndex: 28 },
+	"FlowerForest":    { description: "",                                                                                                                   iconIndex: 26 },
+	"MushroomIsland":  { description: "",                                                                                                                   iconIndex: 29 },
+	"Horse":           { description: "",                                                                                                                   iconIndex: 34 },
+	"Wolf":            { description: "",                                                                                                                   iconIndex: 35 },
+	"Dragon":          { description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", iconIndex: 36 },
+	"SeaMonster":      { description: "",                                                                                                                   iconIndex: 46 },
+	"Ship":            { description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             iconIndex: 37 },
+	"FenceOverlay":    { description: "",                                                                                                                   iconIndex: 13 },
+	"IslandOverlay":   { description: "",                                                                                                                   iconIndex: 30 },
+	"Label":	       { description: "a location-type that has no icon by default, you can use it to place plain text onto the map.",                     	iconIndex: -1 }
 };
 
 /**
@@ -260,6 +260,10 @@ function saveJsonFile(data){
 	return result;
 }
 
+function getLocationTypes(req, resp){
+	resp.json(LocationTypes);
+}
+
 /**
  * Get the data file for our minecraft cordinates
  * @param {Request} req request object from Express
@@ -331,6 +335,7 @@ function startServer() {
   // Handle requests for the data
   app.get('/locations/:filename', getLocations);
   app.get('/locations', getLocations);
+  app.get('/locationtypes', getLocationTypes);
   app.post('/locations', saveLocations);
 
   // Handle requests for static files

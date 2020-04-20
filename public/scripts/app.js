@@ -23,41 +23,10 @@ const minecordApp = {
 	native: true,
 	selectedLocations: {},
 	addDialogContainer: document.getElementById('addDialogContainer'),
+	locationTypes: {}
 };
 
 //Static data
-
-/**
- * Location type data
- */
-const LocationTypes = {
-	"Spawn":           { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerHouse":     { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerCastle":    { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerFarm":      { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerMachine":   { description: "",                                                                                                                   iconIndex: -1 },
-	"PlayerStructure": { description: "a generic catch-all block for things players have built that defy any more specific icons.",                         iconIndex: -1 },
-	"EnchantingRoom":  { description: "",                                                                                                                   iconIndex: -1 },
-	"Village":         { description: "",                                                                                                                   iconIndex: -1 },
-	"DesertVillage":   { description: "",                                                                                                                   iconIndex: 1 },
-	"SavannahVillage": { description: "",                                                                                                                   iconIndex: 0 },
-	"JungleTemple":    { description: "",                                                                                                                   iconIndex: -1 },
-	"DesertTemple":    { description: "",                                                                                                                   iconIndex: -1 },
-	"WitchHut":        { description: "",                                                                                                                   iconIndex: -1 },
-	"NetherFortress":  { description: "",                                                                                                                   iconIndex: -1 },
-	"NetherPortal":    { description: "",                                                                                                                   iconIndex: -1 },
-	"Forest":          { description: "",                                                                                                                   iconIndex: -1 },
-	"FlowerForest":    { description: "",                                                                                                                   iconIndex: -1 },
-	"MushroomIsland":  { description: "",                                                                                                                   iconIndex: -1 },
-	"Horse":           { description: "",                                                                                                                   iconIndex: -1 },
-	"Wolf":            { description: "",                                                                                                                   iconIndex: -1 },
-	"Dragon":          { description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", iconIndex: -1 },
-	"SeaMonster":      { description: "",                                                                                                                   iconIndex: -1 },
-	"Ship":            { description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             iconIndex: -1 },
-	"FenceOverlay":    { description: "",                                                                                                                   iconIndex: -1 },
-	"IslandOverlay":   { description: "",                                                                                                                   iconIndex: -1 },
-	"Label":	       { description: "a location-type that has no icon by default , you can use it to place plain text onto the map.",                     iconIndex: -1 }
-};
 
 /**
  * These all correspond to the icon css class and the index in the array to the icon-index on https://buildingwithblocks.info/map173/index.html?src=legend.txt
@@ -152,7 +121,7 @@ function addLocation() {
   // Create a new card & get the weather data from the server
   const card = getItemCard(location);
 
-  renderLocation(card, {time: Date.now()})
+  renderLocation(card, {time: Date.now(), timezone: 'utc'})
 
   /*
   getLocationFromNetwork(type).then((forecast) => {
@@ -203,8 +172,8 @@ function renderLocation(card, data) {
 	cardLastUpdatedElem.textContent = data.time;
 
 	const updatedLast = luxon.DateTime
-		.fromSeconds(data.time)
-		.setZone(data.timezone)
+		.fromMillis(data.time)
+		//.setZone(data.timezone)
 		.toFormat('DDDD t');
 	card.querySelector('.date').textContent = updatedLast;
 
@@ -243,6 +212,31 @@ function getLocationFromCache(cords) {
 }
 
 /**
+ * Get's the cached location type data from the caches object.
+ *
+ * @return {Object} The location type data, if the request fails, return null.
+ */
+function getLocationTypesFromCache() {
+	// CODELAB: Add code to get weather forecast from the caches object.
+  
+  }
+
+/**
+ * Get's the latest location types from the network.
+ *
+ * @return {Object} The location types, if the request fails, return null.
+ */
+function getLocationTypesFromNetwork(){
+	return fetch(`/locationtypes`)
+	.then((response) => {
+	  return response.json();
+	})
+	.catch(() => {
+	  return null;
+	});
+}
+
+/**
  * Get the icon class corresponding to the location type.
  * This is used to display an icon for a location type
  * @param {string} locationType Location Type name according to the list here: http://buildingwithblocks.info/index_expanded.html#locationTypes_heading
@@ -255,8 +249,8 @@ function getLocationTypeIconClass(locationType){
 	//Setup variable to return
 	var iconClass = "";
 
-	if(LocationTypes.hasOwnProperty(locationType)){
-		const type = LocationTypes[locationType];
+	if(minecordApp.locationTypes.hasOwnProperty(locationType)){
+		const type = minecordApp.locationTypes[locationType];
 		if(type.hasOwnProperty("iconIndex") && type.iconIndex > -1 && type.iconIndex < IconClasses.length){
 			iconClass = IconClasses[type.iconIndex];
 		}
@@ -325,7 +319,7 @@ function updateData() {
           renderForecast(card, forecast);
 		});
 		*/
-	renderLocation(card, {time: Date.now()});
+	renderLocation(card, {time: Date.now(), timezone: 'utc'});
   });
 }
 
@@ -356,7 +350,7 @@ function loadLocationList() {
   if (!locations || Object.keys(locations).length === 0) {
     const key = '0|0|0';
     locations = {};
-    locations[key] = {type: Chest, x: 0, y: 0, z: 0, description: "Some cool fake chest", owner: "User", url: "", iconIndex: 43 };
+    locations[key] = {type: 'WitchHut', x: 0, y: 0, z: 0, description: "Some cool fake chest", owner: "User", url: "", iconIndex: 43 };
   }
   return locations;
 }
@@ -366,8 +360,13 @@ function loadLocationList() {
  * renders the initial data.
  */
 function init() {
-  // Get the location list, and update the UI.
+  // Get the location list
   minecordApp.selectedLocations = loadLocationList();
+
+  //Get the possible location types
+  getLocationTypesFromNetwork().then((locationTypes) => {
+	minecordApp.locationTypes = locationTypes;
+  });
   updateData();
 
   // Set up the event handlers for all of the buttons.
