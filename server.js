@@ -20,6 +20,7 @@
 
 const express = require('express');
 const fetch = require('node-fetch');
+const fs = require('fs');
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
 // CODELAB: Change this to add a delay (ms) before the server responds.
@@ -54,90 +55,11 @@ const fakeData = {
 //Static data
 
 /**
- * Location type data
+ * Any static data we will use in this app
  */
-const LocationTypes = {
-	"Spawn":           { description: "",                                                                                                                   iconIndex: 40 },
-	"PlayerHouse":     { description: "",                                                                                                                   iconIndex: 10 },
-	"PlayerCastle":    { description: "",                                                                                                                   iconIndex: 9  },
-	"PlayerFarm":      { description: "",                                                                                                                   iconIndex: 14 },
-	"PlayerMachine":   { description: "",                                                                                                                   iconIndex: 12 },
-	"PlayerStructure": { description: "a generic catch-all block for things players have built that defy any more specific icons.",                         iconIndex: 8  },
-	"EnchantingRoom":  { description: "",                                                                                                                   iconIndex: 44 },
-	"Village":         { description: "",                                                                                                                   iconIndex: 0  },
-	"DesertVillage":   { description: "",                                                                                                                   iconIndex: 1  },
-	"SavannahVillage": { description: "",                                                                                                                   iconIndex: 0  },
-	"JungleTemple":    { description: "",                                                                                                                   iconIndex: 4  },
-	"DesertTemple":    { description: "",                                                                                                                   iconIndex: 5  },
-	"WitchHut":        { description: "",                                                                                                                   iconIndex: 3  },
-	"NetherFortress":  { description: "",                                                                                                                   iconIndex: 6  },
-	"NetherPortal":    { description: "",                                                                                                                   iconIndex: 7  },
-	"Forest":          { description: "",                                                                                                                   iconIndex: 28 },
-	"FlowerForest":    { description: "",                                                                                                                   iconIndex: 26 },
-	"MushroomIsland":  { description: "",                                                                                                                   iconIndex: 29 },
-	"Horse":           { description: "",                                                                                                                   iconIndex: 34 },
-	"Wolf":            { description: "",                                                                                                                   iconIndex: 35 },
-	"Dragon":          { description: "a dragon. You can use it to indicate an End portal, the Ender Dragon, or just as 'Here be dragons' map decoration.", iconIndex: 36 },
-	"SeaMonster":      { description: "",                                                                                                                   iconIndex: 46 },
-	"Ship":            { description: "a sailing ship. You can use it to decorate the map and indicate ocean.",                                             iconIndex: 37 },
-	"FenceOverlay":    { description: "",                                                                                                                   iconIndex: 13 },
-	"IslandOverlay":   { description: "",                                                                                                                   iconIndex: 30 },
-	"Label":	       { description: "a location-type that has no icon by default, you can use it to place plain text onto the map.",                     	iconIndex: -1 }
+const AppData = {
+	LocationTypes: {}
 };
-
-/**
- * These all correspond to the icon css class and the index in the array to the icon-index on https://buildingwithblocks.info/map173/index.html?src=legend.txt
- */
-const IconClasses = [
-  "SavannahVillage",
-  "DesertVillage",
-  "Skull",
-  "WhitchHut",
-  "JungleTemple",
-  "DesertTemple",
-  "NetherFortress",
-  "NetherPortal",
-  "PlayerStructure",
-  "PlayerCastle",
-  "PlayerHouse",
-  "RailwayStructure",
-  "PlayerMachine",
-  "FenceOverlay",
-  "PlayerFarm",
-  "Chicken",
-  "Pig",
-  "Cow",
-  "Sheep",
-  "Pumpkin",
-  "MonumentSarsenStones",
-  "MonumentObelisk",
-  "MonumentMaoi",
-  "ForestOak",
-  "ForestSampling",
-  "ForestPiratePalms",
-  "ForestFlowerForest",
-  "ForestDark",
-  "Forest",
-  "MushroomIsland",
-  "IslandOverlay",
-  "IcePlainsSpikes",
-  "Mountains1",
-  "Mountains2",
-  "Cave",
-  "Horse",
-  "Wolf",
-  "Dragon",
-  "SeaMonster",
-  "Ship1",
-  "Ship2",
-  "CompassRose",
-  "Spawn",
-  "Marker2",
-  "Marker3",
-  "Chest",
-  "EnchantingRoom",
-  "Anvil"
-];
 
 /**
  * Generates fake data in case the file is not available.
@@ -197,7 +119,7 @@ function readFile(fileData){
 			if(timezone in element){
 				location.timezone = String(element.timezone);
 			}
-			if(type in element && LocationTypes.hasOwnProperty(element.type)){
+			if(type in element && AppData.LocationTypes.hasOwnProperty(element.type)){
 				location.type = element.type;
 			}
 			if(x in element){
@@ -260,10 +182,6 @@ function saveJsonFile(data){
 	return result;
 }
 
-function getLocationTypes(req, resp){
-	resp.json(LocationTypes);
-}
-
 /**
  * Get the data file for our minecraft cordinates
  * @param {Request} req request object from Express
@@ -318,6 +236,9 @@ function saveLocations(req, resp){
 function startServer() {
   const app = express();
 
+  const locationTypesContent = fs.readFileSync('public/data/LocationTypes.json');
+  AppData.LocationTypes = JSON.parse(locationTypesContent);
+
   // Redirect HTTP to HTTPS,
   app.use(redirectToHTTPS([/localhost:(\d{4})/], [], 301));
 
@@ -335,8 +256,8 @@ function startServer() {
   // Handle requests for the data
   app.get('/locations/:filename', getLocations);
   app.get('/locations', getLocations);
-  app.get('/locationtypes', getLocationTypes);
   app.post('/locations', saveLocations);
+  
 
   // Handle requests for static files
   app.use(express.static('public'));

@@ -23,64 +23,9 @@ const minecordApp = {
 	native: true,
 	selectedLocations: {},
 	addDialogContainer: document.getElementById('addDialogContainer'),
-	locationTypes: {}
+	locationTypes: {},
+	iconClasses: []
 };
-
-//Static data
-
-/**
- * These all correspond to the icon css class and the index in the array to the icon-index on https://buildingwithblocks.info/map173/index.html?src=legend.txt
- */
-const IconClasses = [
-  "SavannahVillage",
-  "DesertVillage",
-  "Skull",
-  "WhitchHut",
-  "JungleTemple",
-  "DesertTemple",
-  "NetherFortress",
-  "NetherPortal",
-  "PlayerStructure",
-  "PlayerCastle",
-  "PlayerHouse",
-  "RailwayStructure",
-  "PlayerMachine",
-  "FenceOverlay",
-  "PlayerFarm",
-  "Chicken",
-  "Pig",
-  "Cow",
-  "Sheep",
-  "Pumpkin",
-  "MonumentSarsenStones",
-  "MonumentObelisk",
-  "MonumentMaoi",
-  "ForestOak",
-  "ForestSampling",
-  "ForestPiratePalms",
-  "ForestFlowerForest",
-  "ForestDark",
-  "Forest",
-  "MushroomIsland",
-  "IslandOverlay",
-  "IcePlainsSpikes",
-  "Mountains1",
-  "Mountains2",
-  "Cave",
-  "Horse",
-  "Wolf",
-  "Dragon",
-  "SeaMonster",
-  "Ship1",
-  "Ship2",
-  "CompassRose",
-  "Spawn",
-  "Marker2",
-  "Marker3",
-  "Chest",
-  "EnchantingRoom",
-  "Anvil"
-];
 
 /**
  * Toggles the visibility of the add location dialog box.
@@ -177,12 +122,58 @@ function renderLocation(card, data) {
 		.toFormat('DDDD t');
 	card.querySelector('.date').textContent = updatedLast;
 
+	//Update location type icon
+	const locTypeLabel = card.querySelector('.info .loc-type-label');
+	const locTypeIconClass = getLocationTypeIconClass(locTypeLabel.textContent);
+	card.querySelector('.info .loc-type').className = `loc-type ${locTypeIconClass}`;
+
+	//Update icon index icon
+	const iconIndex = card.querySelector('.info .icon-index-label').textContent;
+	const iconIndexClass = minecordApp.iconClasses[iconIndex];
+	card.querySelector('.info .icon-index-name').textContent = iconIndexClass;
+	card.querySelector('.info .icon-index').className = `icon-index ${iconIndexClass}`;
+
 	// If the loading spinner is still visible, remove it.
 	const spinner = card.querySelector('.card-spinner');
 	if (spinner) {
 		card.removeChild(spinner);
 	}
 }
+
+/**
+ * Get's the HTML element for the x-y-z data, or clones the template
+ * and adds it to the DOM if we're adding a new item.
+ *
+ * @param {Object} location Location object
+ * @return {Element} The element for the location card.
+ */
+function getItemCard(location) {
+	const id = location.x + "|" + location.y + "|" + location.z;
+	const card = document.getElementById(id);
+	if (card) {
+	  return card;
+	}
+	const newCard = document.getElementById('item-template').cloneNode(true);
+	newCard.querySelector('.location').textContent = location.x + "," + location.y + "," + location.z;
+	newCard.setAttribute('id', id);
+  
+	//fill out the other data
+	newCard.querySelector('.description').textContent = location.description;
+	newCard.querySelector('.owner').textContent = location.owner;
+
+	//Set the location type text
+	newCard.querySelector('.info .loc-type-label').textContent = location.type;
+  
+	newCard.querySelector('.url').textContent = location.url;
+	
+	newCard.querySelector('.info .icon-index-label').textContent = location.iconIndex;
+  
+	newCard.querySelector('.remove-item')
+		.addEventListener('click', removeLocation);
+	document.querySelector('main').appendChild(newCard);
+	newCard.removeAttribute('hidden');
+	return newCard;
+  }
 
 /**
  * Get's the latest locations from the network.
@@ -201,39 +192,103 @@ function getLocationsFromNetwork(fileName) {
 }
 
 /**
- * Get's the cached location data from the caches object.
+ * Get's the cached locations data from the caches object.
  *
- * @param {String} cords Cords of location object to get.
- * @return {Object} The location data, if the request fails, return null.
+ * @param {String} filename Filename of locations object to get.
+ * @return {Object} The locations data, if the request fails, return null.
  */
-function getLocationFromCache(cords) {
-  // CODELAB: Add code to get weather forecast from the caches object.
+function getLocationsFromCache(filename) {
+	// Add code to get locations data from the caches object.
+	if(!('caches' in window)){
+		return null;
+	}
 
+	const url = `${window.location.origin}/locations/${filename}`;
+	return caches.match(url)
+	.then((response) => {
+		if(response) {
+			return response.json();
+		}
+		return null;
+	})
+	.catch((err) => {
+		console.error('Error getting data from cache', err);
+		return null;
+	});
 }
 
-/**
- * Get's the cached location type data from the caches object.
- *
- * @return {Object} The location type data, if the request fails, return null.
- */
-function getLocationTypesFromCache() {
-	// CODELAB: Add code to get weather forecast from the caches object.
-  
-  }
+function updateLocationTypes(locationTypes){
+	minecordApp.locationTypes = locationTypes;
+}
 
-/**
- * Get's the latest location types from the network.
- *
- * @return {Object} The location types, if the request fails, return null.
- */
-function getLocationTypesFromNetwork(){
-	return fetch(`/locationtypes`)
-	.then((response) => {
-	  return response.json();
-	})
-	.catch(() => {
-	  return null;
+function updateIconClasses(iconClasses){
+	minecordApp.iconClasses = iconClasses;
+	renderAllCards();
+}
+
+function loadLocationTypes(){
+	var networkDataReceived = false;
+
+	//startSpinner();
+
+	//fetch fresh data
+	var networkUpdate = fetch('/data/LocationTypes.json').then(function(response){
+		return response.json();
+	}).then(function(locationTypes){
+		networkDataReceived = true;
+		updateLocationTypes(locationTypes);
 	});
+
+	if ('caches' in window) {
+		//fetch cahced data
+		caches.match('/data/LocationTypes.json').then(function(response){
+			if(!response) throw Error("No data");
+			return response.json();
+		}).then(function(locationTypes){
+			//don't overwrite newer network data
+			if(!networkDataReceived){
+				updateLocationTypes(locationTypes);
+			}
+		}).catch(function(){
+			//we didn't get cached data, the network is our last hope
+			return networkUpdate;
+		}).catch(console.log('Error')//showErrorMessage
+			).then(console.log("stop spinner"));//stopSpinner());
+	} else {
+		return networkUpdate;
+	}
+}
+
+function loadIconClasses(){
+	var networkDataReceived = false;
+
+	//startSpinner();
+
+	//fetch fresh data
+	var networkUpdate = fetch('/data/IconClasses.json').then(function(response){
+		return response.json();
+	}).then(function(iconClasses){
+		networkDataReceived = true;
+		updateIconClasses(iconClasses);
+	});
+
+	if ('caches' in window) {
+		//fetch cahced data
+		caches.match('/data/IconClasses.json').then(function(response){
+			if(!response) throw Error("No data");
+			return response.json();
+		}).then(function(iconClasses){
+			//don't overwrite newer network data
+			if(!networkDataReceived){
+				updateIconClasses(iconClasses);
+			}
+		}).catch(function(){
+			//we didn't get cached data, the network is our last hope
+			return networkUpdate;
+		}).catch(console.log('error')/*showErrorMessage*/).then(console.log('stop spinner'));//stopSpinner());
+	} else {
+		return networkUpdate;
+	}
 }
 
 /**
@@ -251,8 +306,8 @@ function getLocationTypeIconClass(locationType){
 
 	if(minecordApp.locationTypes.hasOwnProperty(locationType)){
 		const type = minecordApp.locationTypes[locationType];
-		if(type.hasOwnProperty("iconIndex") && type.iconIndex > -1 && type.iconIndex < IconClasses.length){
-			iconClass = IconClasses[type.iconIndex];
+		if(type.hasOwnProperty("iconIndex") && type.iconIndex > -1 && type.iconIndex < minecordApp.iconClasses.length){
+			iconClass = minecordApp.iconClasses[type.iconIndex];
 		}
 	}
 
@@ -260,67 +315,34 @@ function getLocationTypeIconClass(locationType){
 }
 
 /**
- * Get's the HTML element for the x-y-z data, or clones the template
- * and adds it to the DOM if we're adding a new item.
- *
- * @param {Object} location Location object
- * @return {Element} The element for the location card.
- */
-function getItemCard(location) {
-  const id = location.x + "|" + location.y + "|" + location.z;
-  const card = document.getElementById(id);
-  if (card) {
-    return card;
-  }
-  const newCard = document.getElementById('item-template').cloneNode(true);
-  newCard.querySelector('.location').textContent = location.x + "," + location.y + "," + location.z;
-  newCard.setAttribute('id', id);
-
-  //fill out the other data
-  newCard.querySelector('.description').textContent = location.description;
-  newCard.querySelector('.owner').textContent = location.owner;
-
-  const locType = newCard.querySelector('.info .loc-type');
-
-  //Lookup the icon for this location type and set the class on the div
-  locType.textContent = location.type;
-  const locTypeIconClass = getLocationTypeIconClass(location.type);
-  locType.className = `loc-type ${locTypeIconClass}`;
-
-  newCard.querySelector('.url').textContent = location.url;
-  
-  const iconIndexDiv = newCard.querySelector('.info .icon-index');
-  iconIndexDiv.textContent = location.iconIndex + " - " + IconClasses[location.iconIndex];
-  const iconIndexClass = IconClasses[location.iconIndex]; 
-  iconIndexDiv.className = `icon-index ${iconIndexClass}`;
-
-  newCard.querySelector('.remove-item')
-      .addEventListener('click', removeLocation);
-  document.querySelector('main').appendChild(newCard);
-  newCard.removeAttribute('hidden');
-  return newCard;
-}
-
-
-/**
- * Gets the latest location data and updates each card with the
- * new data.
+ * Get all the data from cache or the network that we need
  */
 function updateData() {
-  Object.keys(minecordApp.selectedLocations).forEach((key) => {
-    const location = minecordApp.selectedLocations[key];
-    const card = getItemCard(location);
-    // CODELAB: Add code to call getForecastFromCache
 
-	// Get the forecast data from the network.
-	/*
-    getLocationFromNetwork(location.geo)
-        .then((forecast) => {
-          renderForecast(card, forecast);
-		});
-		*/
-	renderLocation(card, {time: Date.now(), timezone: 'utc'});
-  });
+	Object.keys(minecordApp.selectedLocations).forEach((key) => {
+		const location = minecordApp.selectedLocations[key];
+		const card = getItemCard(location);
+		// CODELAB: Add code to call getForecastFromCache
+
+		// Get the forecast data from the network.
+		/*
+		getLocationFromNetwork(location.geo)
+			.then((forecast) => {
+			  renderForecast(card, forecast);
+			});
+			*/
+	});
+}
+
+function renderAllCards() {
+	Object.keys(minecordApp.selectedLocations).forEach((key) => {
+		const location = minecordApp.selectedLocations[key];
+
+		//This should get an existing card
+		const card = getItemCard(location);
+
+		renderLocation(card, { time: Date.now(), timezone: 'utc' });
+	});
 }
 
 /**
@@ -360,20 +382,21 @@ function loadLocationList() {
  * renders the initial data.
  */
 function init() {
-  // Get the location list
-  minecordApp.selectedLocations = loadLocationList();
+	// Get the location list
+	minecordApp.selectedLocations = loadLocationList();
 
-  //Get the possible location types
-  getLocationTypesFromNetwork().then((locationTypes) => {
-	minecordApp.locationTypes = locationTypes;
-  });
-  updateData();
+	//add all our cards
+	updateData();
 
-  // Set up the event handlers for all of the buttons.
-  document.getElementById('butRefresh').addEventListener('click', updateData);
-  document.getElementById('butAdd').addEventListener('click', toggleAddDialog);
-  document.getElementById('butDialogCancel').addEventListener('click', toggleAddDialog);
-  document.getElementById('butDialogAdd').addEventListener('click', addLocation);
+	//Load all our static lookup data
+	loadLocationTypes();
+	loadIconClasses();
+
+	// Set up the event handlers for all of the buttons.
+	document.getElementById('butRefresh').addEventListener('click', updateData);
+	document.getElementById('butAdd').addEventListener('click', toggleAddDialog);
+	document.getElementById('butDialogCancel').addEventListener('click', toggleAddDialog);
+	document.getElementById('butDialogAdd').addEventListener('click', addLocation);
 }
 
 init();

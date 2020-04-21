@@ -176,336 +176,336 @@ body {
 .icon-index.Chest {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1376px 0px;
+	background: url(/images/glyphs.png) -1376px 0px;
 }
 
 .loc-type.Anvil,
 .icon-index.Anvil {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1440px 0px;
+	background: url(/images/glyphs.png) -1440px 0px;
 }
 
 .loc-type.EnchantingRoom,
 .icon-index.EnchantingRoom {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1408px 0px;
+	background: url(/images/glyphs.png) -1408px 0px;
 }
 
 .loc-type.SavannahVillage,
 .icon-index.SavannahVillage {
 	width: 14px;
 	height: 15px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -9px -7px;
+	background: url(/images/glyphs.png) -9px -7px;
 }
 
 .loc-type.DesertVillage,
 .icon-index.DesertVillage {
 	width: 14px;
 	height: 15px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -41px -7px;
+	background: url(/images/glyphs.png) -41px -7px;
 }
 
 .loc-type.Skull,
 .icon-index.Skull {
 	width: 14px;
 	height: 19px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -73px -7px;
+	background: url(/images/glyphs.png) -73px -7px;
 }
 
 .loc-type.WhitchHut,
 .icon-index.WhitchHut {
 	width: 14px;
 	height: 21px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -105px -1px;
+	background: url(/images/glyphs.png) -105px -1px;
 }
 
 .loc-type.JungleTemple,
 .icon-index.JungleTemple {
 	width: 20px;
 	height: 18px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -134px -5px;
+	background: url(/images/glyphs.png) -134px -5px;
 }
 
 .loc-type.DesertTemple,
 .icon-index.DesertTemple {
 	width: 9px;
 	height: 17px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -172px -8px;
+	background: url(/images/glyphs.png) -172px -8px;
 }
 
 .loc-type.NetherFortress,
 .icon-index.NetherFortress {
 	width: 10px;
 	height: 14px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -203px -8px;
+	background: url(/images/glyphs.png) -203px -8px;
 }
 
 .loc-type.NetherPortal,
 .icon-index.NetherPortal {
 	width: 10px;
 	height: 13px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -235px -9px;
+	background: url(/images/glyphs.png) -235px -9px;
 }
 
 .loc-type.PlayerStructure,
 .icon-index.PlayerStructure {
 	width: 10px;
 	height: 10px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -267px -11px;
+	background: url(/images/glyphs.png) -267px -11px;
 }
 
 .loc-type.PlayerCastle,
 .icon-index.PlayerCastle {
 	width: 10px;
 	height: 14px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -299px -8px;
+	background: url(/images/glyphs.png) -299px -8px;
 }
 
 .loc-type.PlayerHouse,
 .icon-index.PlayerHouse {
 	width: 12px;
 	height: 11px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -330px -10px;
+	background: url(/images/glyphs.png) -330px -10px;
 }
 
 .loc-type.RailwayStructure,
 .icon-index.RailwayStructure {
 	width: 15px;
 	height: 8px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -360px -12px;
+	background: url(/images/glyphs.png) -360px -12px;
 }
 
 .loc-type.PlayerMachine,
 .icon-index.PlayerMachine {
 	width: 12px;
 	height: 18px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -394px -3px;
+	background: url(/images/glyphs.png) -394px -3px;
 }
 
 .loc-type.FenceOverlay,
 .icon-index.FenceOverlay {
 	width: 28px;
 	height: 9px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -418px -16px;
+	background: url(/images/glyphs.png) -418px -16px;
 }
 
 .loc-type.PlayerFarm,
 .icon-index.PlayerFarm {
 	width: 15px;
 	height: 16px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -458px -6px;
+	background: url(/images/glyphs.png) -458px -6px;
 }
 
 .loc-type.Chicken,
 .icon-index.Chicken {
 	width: 12px;
 	height: 12px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -490px -10px;
+	background: url(/images/glyphs.png) -490px -10px;
 }
 
 .loc-type.Pig,
 .icon-index.Pig {
 	width: 8px;
 	height: 8px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -524px -12px;
+	background: url(/images/glyphs.png) -524px -12px;
 }
 
 .loc-type.Cow,
 .icon-index.Cow {
 	width: 10px;
 	height: 9px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -555px -11px;
+	background: url(/images/glyphs.png) -555px -11px;
 }
 
 .loc-type.Sheep,
 .icon-index.Sheep {
 	width: 8px;
 	height: 8px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -588px -12px;
+	background: url(/images/glyphs.png) -588px -12px;
 }
 
 .loc-type.Pumpkin,
 .icon-index.Pumpkin {
 	width: 12px;
 	height: 12px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -618px -10px;
+	background: url(/images/glyphs.png) -618px -10px;
 }
 
 .loc-type.MonumentSarsenStones,
 .icon-index.MonumentSarsenStones {
 	width: 16px;
 	height: 16px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -648px -39px;
+	background: url(/images/glyphs.png) -648px -39px;
 }
 
 .loc-type.MonumentObelisk,
 .icon-index.MonumentObelisk {
 	width: 4px;
 	height: 17px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -686px -39px;
+	background: url(/images/glyphs.png) -686px -39px;
 }
 
 .loc-type.MonumentMaoi,
 .icon-index.MonumentMaoi {
 	width: 20px;
 	height: 26px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -709px -32px;
+	background: url(/images/glyphs.png) -709px -32px;
 }
 
 .loc-type.ForestOak,
 .icon-index.ForestOak {
 	width: 15px;
 	height: 15px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -744px -8px;
+	background: url(/images/glyphs.png) -744px -8px;
 }
 
 .loc-type.ForestSampling,
 .icon-index.ForestSampling {
 	width: 14px;
 	height: 15px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -777px -7px;
+	background: url(/images/glyphs.png) -777px -7px;
 }
 
 .loc-type.ForestPiratePalms,
 .icon-index.ForestPiratePalms {
 	width: 17px;
 	height: 15px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -809px -8px;
+	background: url(/images/glyphs.png) -809px -8px;
 }
 
 .loc-type.ForestFlowerForest,
 .icon-index.ForestFlowerForest {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -832px -32px;
+	background: url(/images/glyphs.png) -832px -32px;
 }
 
 .loc-type.ForestDark,
 .icon-index.ForestDark {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -864px -32px;
+	background: url(/images/glyphs.png) -864px -32px;
 }
 
 .loc-type.Forest,
 .icon-index.Forest {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -899px -32px;
+	background: url(/images/glyphs.png) -899px -32px;
 }
 
 .loc-type.MushroomIsland,
 .icon-index.MushroomIsland {
 	width: 20px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -934px -32px;
+	background: url(/images/glyphs.png) -934px -32px;
 }
 
 .loc-type.IslandOverlay,
 .icon-index.IslandOverlay {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -960px -32px;
+	background: url(/images/glyphs.png) -960px -32px;
 }
 
 .loc-type.IcePlainsSpikes,
 .icon-index.IcePlainsSpikes {
 	width: 29px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1506px -32px;
+	background: url(/images/glyphs.png) -1506px -32px;
 }
 
 .loc-type.Mountains,
 .icon-index.Mountains1 {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -992px -32px;
+	background: url(/images/glyphs.png) -992px -32px;
 }
 
 .loc-type.Mountains,
 .icon-index.Mountains2 {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1024px -32px;
+	background: url(/images/glyphs.png) -1024px -32px;
 }
 
 .loc-type.Cave,
 .icon-index.Cave {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1056px -32px;
+	background: url(/images/glyphs.png) -1056px -32px;
 }
 
 .loc-type.Horse,
 .icon-index.Horse {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1088px -32px;
+	background: url(/images/glyphs.png) -1088px -32px;
 }
 
 .loc-type.Wolf,
 .icon-index.Wolf {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1120px -32px;
+	background: url(/images/glyphs.png) -1120px -32px;
 }
 
 .loc-type.Dragon,
 .icon-index.Dragon {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1152px -32px;
+	background: url(/images/glyphs.png) -1152px -32px;
 }
 
 .loc-type.SeaMonster,
 .icon-index.SeaMonster {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1472px -32px;
+	background: url(/images/glyphs.png) -1472px -32px;
 }
 
 .loc-type.Ship1,
 .icon-index.Ship1 {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1184px -32px;
+	background: url(/images/glyphs.png) -1184px -32px;
 }
 
 .loc-type.Ship2,
 .icon-index.Ship2 {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1216px -32px;
+	background: url(/images/glyphs.png) -1216px -32px;
 }
 
 .loc-type.CompassRose,
 .icon-index.CompassRose {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1248px -32px;
+	background: url(/images/glyphs.png) -1248px -32px;
 }
 
 .loc-type.Spawn,
 .icon-index.Spawn {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1286px 0px;
+	background: url(/images/glyphs.png) -1286px 0px;
 }
 
 .loc-type.Marker2,
 .icon-index.Marker2 {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1318px 0px;
+	background: url(/images/glyphs.png) -1318px 0px;
 }
 
 .loc-type.Marker3,
 .icon-index.Marker3 {
 	width: 32px;
 	height: 32px;
-	background: url(https://cdn.glitch.com/dd034314-9e25-4c57-a2b9-ff5b7e56ee38%2Fglyphs.png?v=1586662555412) -1344px -32px;
+	background: url(/images/glyphs.png) -1344px -32px;
 }
 
 /**
@@ -519,58 +519,6 @@ body {
 
 .icon.add {
 	background-image: url("/images/add.svg");
-}
-
-.icon.clear-day {
-	background-image: url("/images/clear-day.svg");
-}
-
-.icon.clear-night {
-	background-image: url("/images/clear-night.svg");
-}
-
-.icon.rain {
-	background-image: url("/images/rain.svg");
-}
-
-.icon.snow {
-	background-image: url("/images/snow.svg");
-}
-
-.icon.sleet {
-	background-image: url("/images/sleet.svg");
-}
-
-.icon.wind {
-	background-image: url("/images/wind.svg");
-}
-
-.icon.fog {
-	background-image: url("/images/fog.svg");
-}
-
-.icon.cloudy {
-	background-image: url("/images/cloudy.svg");
-}
-
-.icon.partly-cloudy-day {
-	background-image: url("/images/partly-cloudy-day.svg");
-}
-
-.icon.partly-cloudy-night {
-	background-image: url("/images/partly-cloudy-night.svg");
-}
-
-.icon.hail {
-	background-image: url("/images/hail.svg");
-}
-
-.icon.thunderstorm {
-	background-image: url("/images/thunderstorm.svg");
-}
-
-.icon.tornado {
-	background-image: url("/images/tornado.svg");
 }
 
 /**
@@ -712,63 +660,18 @@ textarea {
 	display: flex;
 }
 
-.item-card .info .loc-type {
+.item-card .info .loc-type-label {
 	font-size: 1.25em;
 }
 
-.item-card .info .icon-index {
+.item-card .info .icon-index-label,
+.item-card .info .icon-index-name {
 	font-size: 1.25em;
 }
 
 .item-card .info .url {
 	flex-grow: 1;
 	font-size: 1.25em;
-}
-
-
-
-.item-card .current .visual {
-	display: flex;
-	font-size: 4em;
-}
-
-.item-card .current .visual .scale {
-	font-size: 0.5em;
-	vertical-align: super;
-}
-
-.item-card .current .visual,
-.item-card .current .description {
-	flex-grow: 1;
-}
-
-.item-card .current .description .label {
-	color: #666;
-}
-
-.item-card .future {
-	display: flex;
-}
-
-.item-card .future .oneday {
-	flex-grow: 1;
-	text-align: center;
-}
-
-.item-card .future .oneday .icon {
-	height: 64px;
-	margin-left: auto;
-	margin-right: auto;
-	width: 64px;
-}
-
-.item-card .future .oneday .temp-high,
-.item-card .future .oneday .temp-low {
-	display: inline-block;
-}
-
-.item-card .future .oneday .temp-low {
-	color: #666;
 }
 
 /**
