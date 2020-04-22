@@ -61,7 +61,13 @@
     <div id="about" class="item-card">
       <b>About</b><br>
       Log minecraft coordinates, save them to dropbox and then view them in <a href="http://buildingwithblocks.info/">The Ink & Parchment Map</a>.
-    </div>
+	</div>
+	
+	<div id="pageSpinner">
+		<svg viewBox="0 0 32 32" width="32" height="32">
+			<circle cx="16" cy="16" r="14" fill="none"></circle>
+		</svg>
+	</div>
 
     <div id="item-template" class="item-card" hidden>
       <div class="card-spinner">
@@ -87,42 +93,41 @@
     </div>
   </main>
 
-  <div id="addDialogContainer">
-    <div class="dialog">
-      <div class="dialog-title">Add New Coordinate</div>
-      <div class="dialog-body">
-		<select id="selectLocationType" aria-label="Location Type">
-			<option value="SavannahVillage">SavannahVillage</option>
-			<option value="DesertVillage">DesertVillage</option>
-		</select>
-		<div>
-			<input type="number" id="xCord" name="xCord" placeholder="X" title="X">
-			<input type="number" id="yCord" name="yCord" placeholder="Y" title="Y">
-			<input type="number" id="zCord" name="zCord" placeholder="Z" title="Z">
+<div id="addDialogContainer">
+	<div class="dialog">
+		<div class="dialog-title">Add New Coordinate</div>
+		<div class="dialog-body">
+			<select id="selectLocationType" aria-label="Location Type">
+			</select>
+			<div>
+				<input type="number" id="xCord" name="xCord" placeholder="X" title="X">
+				<input type="number" id="yCord" name="yCord" placeholder="Y" title="Y">
+				<input type="number" id="zCord" name="zCord" placeholder="Z" title="Z">
+			</div>
+			<div>
+				<textarea id="description-input" name="description-input" placeholder="Description" title="Description"
+					rows="2" cols="30"></textarea>
+			</div>
+			<div>
+				<input list="owners" id="owner-input" name="owner-input" placeholder="Owner" title="Owner">
+				<datalist id="owners">
+				</datalist>
+			</div>
+			<div>
+				<input type="url" id="url-input" name="url-input" placeholder="Url" title="Url">
+			</div>
+			<div>
+				<div id="selectIconIndexIcon" class="icon-index"></div>
+				<select id="selectIconIndex" aria-label="Icon-Index">
+				</select>
+			</div>
 		</div>
-		<div>
-			<textarea id="description-input" name="description-input" placeholder="Description" title="Description" rows="2" cols="30"></textarea>
+		<div class="dialog-buttons">
+			<button id="butDialogCancel" class="button">Cancel</button>
+			<button id="butDialogAdd" class="button">Add</button>
 		</div>
-		<div>
-			<input list="owners" id="owner-input" name="owner-input" placeholder="Owner" title="Owner">
-			<datalist id="owners">
-				<option value="MusicMonkey5555">
-			</datalist>
-		</div>
-		<div>
-			<input type="url" id="url-input" name="url-input" placeholder="Url" title="Url">
-		</div>
-		<select id="selectIconIndex" aria-label="Icon-Index">
-			<option value="0">SavannahVillage</option>
-			<option value="1">DesertVillage</option>
-		</select>
-		</div>
-      <div class="dialog-buttons">
-        <button id="butDialogCancel" class="button">Cancel</button>
-        <button id="butDialogAdd" class="button">Add</button>
-	  </div>
-	  </div>
-  </div>
+	</div>
+</div>
 
   <script src="/scripts/luxon-1.11.4.js"></script>
   <script src="/scripts/app.js"></script>

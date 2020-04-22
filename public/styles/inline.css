@@ -111,6 +111,36 @@ body {
  * Loading spinner
  */
 
+ #pageSpinner {
+	background-color: rgba(255, 255, 255, 0.8);
+	height: 100%;
+	margin-left: -16px;
+	margin-top: -16px;
+	position: absolute;
+	width: 100%;
+	opacity: 0;
+	will-change: opacity;
+}
+
+#pageSpinner svg {
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+#pageSpinner svg circle {
+	animation: line 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, rotate 1.6s linear infinite;
+	box-sizing: border-box;
+	stroke: #3f51b5;
+	stroke-width: 3px;
+	transform-origin: 50%;
+}
+
+#pageSpinner.visible {
+	opacity: 1;
+}
+
 .card-spinner {
 	background-color: rgba(255, 255, 255, 0.8);
 	height: 100%;

@@ -23,15 +23,17 @@ const minecordApp = {
 	native: true,
 	selectedLocations: {},
 	addDialogContainer: document.getElementById('addDialogContainer'),
+	pageSpinner: document.getElementById('pageSpinner'),
 	locationTypes: {},
-	iconClasses: []
+	iconClasses: [],
+	owners: {}
 };
 
 /**
  * Toggles the visibility of the add location dialog box.
  */
 function toggleAddDialog() {
-  minecordApp.addDialogContainer.classList.toggle('visible');
+	minecordApp.addDialogContainer.classList.toggle('visible');
 }
 
 /**
@@ -78,6 +80,14 @@ function addLocation() {
   const key = location.x + "|" + location.y + "|" + location.z;
   minecordApp.selectedLocations[key] = location;
   saveLocationList(minecordApp.selectedLocations);
+
+  //Update list of owners and save it and update the menu for next time
+  if(!(location.owner in minecordApp.owners)){
+	  minecordApp.owners[location.owner] = {count: 0};
+  }
+  minecordApp.owners[location.owner].count++;
+  saveOwnerList(minecordApp.owners);
+  updateOwnersList();
 }
 
 /**
@@ -86,12 +96,22 @@ function addLocation() {
  * @param {Event} evt
  */
 function removeLocation(evt) {
-  const parent = evt.srcElement.parentElement;
-  parent.remove();
-  if (minecordApp.selectedLocations[parent.id]) {
-    delete minecordApp.selectedLocations[parent.id];
-    saveLocationList(minecordApp.selectedLocations);
-  }
+	const parent = evt.srcElement.parentElement;
+	parent.remove();
+	if (minecordApp.selectedLocations[parent.id]) {
+
+		//Update the owner list and save it and update the menu
+		const location = minecordApp.selectedLocations[parent.id];
+		if (minecordApp.owners[location.owner]) {
+			var owner = minecordApp.owners[location.owner];
+			owner.count = owner.count > 0 ? owner.count - 1 : 0;
+		}
+		saveOwnerList(minecordApp.owners);
+		updateOwnersList();
+
+		delete minecordApp.selectedLocations[parent.id];
+		saveLocationList(minecordApp.selectedLocations);
+	}
 }
 
 /**
@@ -151,29 +171,29 @@ function getItemCard(location) {
 	const id = location.x + "|" + location.y + "|" + location.z;
 	const card = document.getElementById(id);
 	if (card) {
-	  return card;
+		return card;
 	}
 	const newCard = document.getElementById('item-template').cloneNode(true);
 	newCard.querySelector('.location').textContent = location.x + "," + location.y + "," + location.z;
 	newCard.setAttribute('id', id);
-  
+
 	//fill out the other data
 	newCard.querySelector('.description').textContent = location.description;
 	newCard.querySelector('.owner').textContent = location.owner;
 
 	//Set the location type text
 	newCard.querySelector('.info .loc-type-label').textContent = location.type;
-  
+
 	newCard.querySelector('.url').textContent = location.url;
-	
+
 	newCard.querySelector('.info .icon-index-label').textContent = location.iconIndex;
-  
+
 	newCard.querySelector('.remove-item')
 		.addEventListener('click', removeLocation);
 	document.querySelector('main').appendChild(newCard);
 	newCard.removeAttribute('hidden');
 	return newCard;
-  }
+}
 
 /**
  * Get's the latest locations from the network.
@@ -217,52 +237,126 @@ function getLocationsFromCache(filename) {
 	});
 }
 
+function startSpinner(){
+	const spinning = minecordApp.pageSpinner.classList.contains('visible');
+	if(!spinning){
+		minecordApp.pageSpinner.classList.toggle('visible');
+	}
+}
+
+function stopSpinner(){
+	const spinning = minecordApp.pageSpinner.classList.contains('visible');
+	if(spinning){
+		minecordApp.pageSpinner.classList.toggle('visible');
+	}
+}
+
+function showErrorMessage(){
+	console.log("Couldn't get app network files.");
+}
+
 function updateLocationTypes(locationTypes){
+	//Set our app data with the updated data
 	minecordApp.locationTypes = locationTypes;
+
+	//Update add dialogue select menu
+	updateLocationTypeDropdown();
+
+	//Update all the cards
+	renderAllCards();
+}
+
+function updateLocationTypeDropdown(){
+	//Update the add dialogue
+	const selectType = document.getElementById('selectLocationType');
+	
+	//Get our html options
+	let output = "";
+	Object.keys(minecordApp.locationTypes).forEach((key) => {
+		const type = minecordApp.locationTypes[key];
+		//const iconClass = getLocationTypeIconClass(type);
+
+		output += `<option value="${key}" title="${type.description}">${key}</option>`;
+	});
+
+	//update the actual select menu
+	selectType.innerHTML = output;
 }
 
 function updateIconClasses(iconClasses){
 	minecordApp.iconClasses = iconClasses;
+
+	//Update add menu dialogue select menu
+	updateIconIndexDropdown();
+
+	//Update all the cards
 	renderAllCards();
+}
+
+function updateIconIndexDropdown(){
+	//Update the add dialogue
+	const selectIconIndex = document.getElementById('selectIconIndex');
+	
+	//Get our html options
+	let output = "";
+	minecordApp.iconClasses.forEach((iconClass, i) => {
+		output += `<option value="${i}"><div class="icon-index ${iconClass}"></div> ${iconClass}</option>`;
+	});
+
+	//update the actual select menu
+	selectIconIndex.innerHTML = output;
+}
+
+function updateOwnersList(){
+	//Update the add dialogue
+	const ownerList = document.getElementById('owners');
+	
+	//Get our html options
+	let output = "";
+	Object.keys(minecordApp.owners)
+	.sort((a,b) => {return minecordApp.owners[a].count - minecordApp.owners[b].count;})
+	.forEach((key) => {
+		const owner = minecordApp.owners[key];
+
+		output += `<option value="${key}">`;
+	});
+
+	//update the actual menu
+	ownerList.innerHTML = output;
 }
 
 function loadLocationTypes(){
 	var networkDataReceived = false;
 
-	//startSpinner();
+	startSpinner();
 
 	//fetch fresh data
-	var networkUpdate = fetch('/data/LocationTypes.json').then(function(response){
+	var networkUpdate = fetch('/data/LocationTypes.json').then(function (response) {
 		return response.json();
-	}).then(function(locationTypes){
+	}).then(function (locationTypes) {
 		networkDataReceived = true;
 		updateLocationTypes(locationTypes);
 	});
 
-	if ('caches' in window) {
-		//fetch cahced data
-		caches.match('/data/LocationTypes.json').then(function(response){
-			if(!response) throw Error("No data");
-			return response.json();
-		}).then(function(locationTypes){
-			//don't overwrite newer network data
-			if(!networkDataReceived){
-				updateLocationTypes(locationTypes);
-			}
-		}).catch(function(){
-			//we didn't get cached data, the network is our last hope
-			return networkUpdate;
-		}).catch(console.log('Error')//showErrorMessage
-			).then(console.log("stop spinner"));//stopSpinner());
-	} else {
+	//fetch cahced data
+	caches.match('/data/LocationTypes.json').then(function (response) {
+		if (!response) throw Error("No data");
+		return response.json();
+	}).then(function (locationTypes) {
+		//don't overwrite newer network data
+		if (!networkDataReceived) {
+			updateLocationTypes(locationTypes);
+		}
+	}).catch(function () {
+		//we didn't get cached data, the network is our last hope
 		return networkUpdate;
-	}
+	}).catch(showErrorMessage).then(stopSpinner());
 }
 
 function loadIconClasses(){
 	var networkDataReceived = false;
 
-	//startSpinner();
+	startSpinner();
 
 	//fetch fresh data
 	var networkUpdate = fetch('/data/IconClasses.json').then(function(response){
@@ -285,7 +379,7 @@ function loadIconClasses(){
 		}).catch(function(){
 			//we didn't get cached data, the network is our last hope
 			return networkUpdate;
-		}).catch(console.log('error')/*showErrorMessage*/).then(console.log('stop spinner'));//stopSpinner());
+		}).catch(showErrorMessage).then(stopSpinner());
 	} else {
 		return networkUpdate;
 	}
@@ -358,7 +452,7 @@ function saveLocationList(locations) {
 /**
  * Loads the list of saved location.
  *
- * @return {Array}
+ * @return {Object}
  */
 function loadLocationList() {
   let locations = localStorage.getItem('locationList');
@@ -378,12 +472,45 @@ function loadLocationList() {
 }
 
 /**
+ * Saves list of owners we have typed in before
+ * @param {Object} owners Map of owners we have previously typed in
+ */
+function saveOwnerList(owners){
+	const data = JSON.stringify(owners);
+	localStorage.setItem('ownerList', data);
+}
+
+/**
+ * Loads the list of owners we have typed in before
+ *
+ * @return {Object} map of owners typed in
+ */
+function loadOwnerList() {
+	let owners = localStorage.getItem('ownerList');
+	if (owners) {
+	  try {
+		owners = JSON.parse(owners);
+	  } catch (ex) {
+		owners = {};
+	  }
+	}
+	if (!owners || Object.keys(owners).length === 0) {
+		owners = {"MusicMonkey5555": {count: 1}};
+	}
+	return owners;
+  }
+
+/**
  * Initialize the app, gets the list of locations from local storage, then
  * renders the initial data.
  */
 function init() {
 	// Get the location list
 	minecordApp.selectedLocations = loadLocationList();
+
+	//Get the owner list
+	minecordApp.owners = loadOwnerList();
+	updateOwnersList();
 
 	//add all our cards
 	updateData();
@@ -397,6 +524,16 @@ function init() {
 	document.getElementById('butAdd').addEventListener('click', toggleAddDialog);
 	document.getElementById('butDialogCancel').addEventListener('click', toggleAddDialog);
 	document.getElementById('butDialogAdd').addEventListener('click', addLocation);
+
+	// Set up the event handlers for dialogue
+	document.getElementById("selectLocationType").addEventListener("change", (event) => {
+		const locationType = minecordApp.locationTypes[event.target.value];
+		document.getElementById("selectIconIndex").value = locationType.iconIndex;
+	});
+	document.getElementById("selectIconIndex").addEventListener("change", (event) => {
+		const iconClass = minecordApp.iconClasses[event.target.value];
+		document.getElementById("selectIconIndexIcon").className = `icon-index ${iconClass}`;
+	});
 }
 
 init();
