@@ -110,6 +110,9 @@ function promptAddLocation(){
 		yCord.value = "";
 		zCord.value = "";
 
+		//Make sure our select menu icon id displayed based on whatever the current value is
+		document.getElementById('selectIconIndex').dispatchEvent(new Event('change'));
+
 		//Show the dialogue
 		minecordApp.addDialogContainer.classList.add('visible');
 	}
@@ -531,6 +534,9 @@ function updateLocationTypeDropdown(){
 
 		return `<option value="${key}" title="${type.description}">${key}</option>`;
 	}).join('\n');
+
+	//Call the even when this is selected so everything looks good
+	selectType.dispatchEvent(new Event('change'));
 }
 
 function updateIconClasses(iconClasses){
@@ -551,6 +557,9 @@ function updateIconIndexDropdown(){
 	selectIconIndex.innerHTML = minecordApp.iconClasses
 	.map((iconClass, i) => `<option value="${i}"><div class="icon-index ${iconClass}"></div> ${iconClass}</option>`
 	).join('\n');
+
+	//Call the even when this is selected so everything looks good
+	selectIconIndex.dispatchEvent(new Event('change'));
 }
 
 /**
@@ -713,8 +722,8 @@ function init() {
 	updateData();
 
 	//Load all our static lookup data
-	loadLocationTypes();
 	loadIconClasses();
+	loadLocationTypes();
 
 	// Set up the event handlers for all of the buttons.
 	document.getElementById('butRefresh').addEventListener('click', updateData);
