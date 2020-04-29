@@ -30,14 +30,12 @@
 	"Forest",
 	"MushroomIsland",
 	"IslandOverlay",
-	"IcePlainsSpikes",
 	"Mountains1",
 	"Mountains2",
 	"Cave",
 	"Horse",
 	"Wolf",
 	"Dragon",
-	"SeaMonster",
 	"Ship1",
 	"Ship2",
 	"CompassRose",
@@ -46,5 +44,7 @@
 	"Marker3",
 	"Chest",
 	"EnchantingRoom",
-	"Anvil"
+	"Anvil",
+	"SeaMonster",
+	"IcePlainsSpikes"
   ]
