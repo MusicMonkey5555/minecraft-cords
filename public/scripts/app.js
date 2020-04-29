@@ -17,77 +17,293 @@
  */
 'use strict';
 
+import LocationList from './modules/location-list.js';
+import MapSettings from './modules/map-settings.js';
+import OwnerList from './modules/owner-list.js';
+import MinecordLocation from './modules/minecord-location.js';
+
+/**
+ * A location type
+ * @typedef {{description: String, iconIndex: Number}} LocationType
+ */
+
+/**
+ * Location types
+ * @typedef {Object.<string, {description: String, iconIndex: Number}} LocationTypes
+ */
+
+/**
+ * Holds all the data about our app
+ */
 const minecordApp = {
+	/**
+	 * Location of file we are saving to (currently from dropbox only)
+	 */
 	filename: "",
-	title: "",
+	/**
+	 * If we are linked to a native file (json) where we can save all the data this app supports
+	 * or if it's linked to a {@link http://buildingwithblocks.info/|Pen & Paper} location formatted file
+	 */
 	native: true,
+	/**
+	 * All the settings for our map
+	 * @type {MapSettings}
+	 */
+	mapSettings: {
+		
+	},
+	/**
+	 * All locations we added
+	 * Key is in format "x|y|z"
+	 * @type {LocationList}
+	 */
 	selectedLocations: {},
+	/** Dialogue used for editing and adding locations */
 	addDialogContainer: document.getElementById('addDialogContainer'),
+	/** Spinner for the page */
 	pageSpinner: document.getElementById('pageSpinner'),
+	/**
+	 * All possible location types
+	 * @type {LocationTypes}
+	 */
 	locationTypes: {},
+	/**
+	 * All possible icon classes
+	 * @type {String[]}
+	 */
 	iconClasses: [],
+	/**
+	 * All currently entered usersnames (loaded from local storage)
+	 * @type {OwnerList}
+	 */
 	owners: {}
 };
 
 /**
- * Toggles the visibility of the add location dialog box.
+ * Check if the add/edit dialogue is visble or not
  */
-function toggleAddDialog() {
-	minecordApp.addDialogContainer.classList.toggle('visible');
+function isDialogueVisible(){
+	return minecordApp.addDialogContainer.classList.contains('visible');
+}
+
+/**
+ * Prompt for a new location to add
+ */
+function promptAddLocation(){
+	const isVisible = isDialogueVisible();
+
+	if(!isVisible){
+		minecordApp.addDialogContainer.querySelector('.dialog-title').textContent = "Add New Coordinate";
+
+		//Change the button title
+		document.getElementById('butDialogAdd').textContent = "Add";
+
+		//Change callback
+		document.getElementById('butDialogAdd').addEventListener('click', addLocation);
+
+		//Reset some values
+		document.getElementById('editLocationKey').textContent = "";
+		const xCord = document.getElementById('xCord');
+		const yCord = document.getElementById('yCord');
+		const zCord = document.getElementById('zCord');
+		xCord.value = "";
+		yCord.value = "";
+		zCord.value = "";
+
+		//Show the dialogue
+		minecordApp.addDialogContainer.classList.add('visible');
+	}
+}
+
+/**
+ * Set the add location prompt to some values passed in (only works if not visible)
+ * @param {MinecordLocation} location Location to update dialogue with
+ * @returns True if we set the prompt values, false if not
+ */
+function setLocationPrompt(location){
+	const isVisible = isDialogueVisible();
+	if(!isVisible){
+		//Fill out the values in the menu
+		// Get the selected type
+		const selectType = document.getElementById('selectLocationType');
+		selectType.value = location.type;
+	  
+		//Get all the input fields
+		const xCord = document.getElementById('xCord');
+		const yCord = document.getElementById('yCord');
+		const zCord = document.getElementById('zCord');
+		const description = document.getElementById('description-input');
+		const owner = document.getElementById('owner-input');
+		const url = document.getElementById('url-input');
+
+		xCord.value = location.x;
+		yCord.value = location.y;
+		zCord.value = location.z;
+		description.value = location.description;
+		owner.value = location.owner;
+		url.value = location.url;
+	  
+		//Get the icon dropdown
+		const selectIcon = document.getElementById('selectIconIndex');
+		selectIcon.value = location.iconIndex;
+		selectIcon.dispatchEvent(new Event('change'));
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Prompt to edit a location after clicking on a card
+ * @param {Event} evt Click event for item card
+ */
+function promptEditLocation(evt) {
+	const parent = evt.srcElement.parentElement;
+	const location = minecordApp.selectedLocations.get(parent.id);
+
+	//Make sure this is a location
+	if (location) {
+		//Try to update the prompt with the location
+		const updated = setLocationPrompt(location);
+
+		//If we were able to set it's values then we can do the rest
+		if (updated) {
+
+			document.getElementById('editLocationKey').textContent = location.getKey();
+
+			//Change the dialogue title
+			minecordApp.addDialogContainer.querySelector('.dialog-title').textContent = "Edit Coordinate";
+
+			//Change the button title
+			document.getElementById('butDialogAdd').textContent = "Edit";
+
+			//Change callback
+			document.getElementById('butDialogAdd').addEventListener('click', function () {
+				const xCord = document.getElementById('xCord');
+				const yCord = document.getElementById('yCord');
+				const zCord = document.getElementById('zCord');
+				const existingKey = document.getElementById('editLocationKey').textContent;
+
+				const loc = new MinecordLocation("", xCord.value, yCord.value, zCord.value);
+				const key = loc.getKey();
+
+				//Remove the location we seem to be editing
+				removeLocationByKey(key);
+
+				//Add the new location
+				addLocation();
+
+				//Clear out what we were editing
+				document.getElementById('editLocationKey').textContent = "";
+			});
+
+			//Show the dialogue
+			minecordApp.addDialogContainer.classList.add('visible');
+		}
+	}
+}
+
+function checkCoordinates(event){
+	const xCord = document.getElementById('xCord');
+	const yCord = document.getElementById('yCord');
+	const zCord = document.getElementById('zCord');
+	const cordError = document.getElementById('cordError');
+	const existingKey = document.getElementById('editLocationKey').textContent;
+
+	const loc = new MinecordLocation("", xCord.value, yCord.value, zCord.value);
+	const key = loc.getKey();
+	const hasKey = minecordApp.selectedLocations.hasKey(key);
+	//Adding warn about overritting an existing value
+	if(existingKey === ""){
+		if(hasKey){
+			cordError.textContent = "Coordinates match existing record, will over-write existing record.";
+			cordError.classList.add('visible');
+		}
+		else
+		{
+			cordError.textContent = "";
+			cordError.classList.remove('visible');
+		}
+	}
+	else
+	{
+		if(hasKey){
+			if(existingKey !== key){
+				cordError.textContent = "Coordinates have changed to another record, will over-write that one instead.";
+				cordError.classList.add('visible');
+			}
+			else
+			{
+				cordError.textContent = "";
+				cordError.classList.remove('visible');
+			}
+		}
+		else
+		{
+			cordError.textContent = "";
+			cordError.classList.remove('visible');
+		}
+	}
 }
 
 /**
  * Event handler for butDialogAdd, adds the selected location to the list.
  */
 function addLocation() {
-  // Hide the dialog
-  toggleAddDialog();
+	// Hide the dialog
+	minecordApp.addDialogContainer.classList.remove('visible');
 
-  // Get the selected type
-  const selectType = document.getElementById('selectLocationType');
-  const selectedType = selectType.options[selectType.selectedIndex];
-  const type = selectedType.value;
-  //const label = selectedType.textContent;
+	// Get the selected type
+	const selectType = document.getElementById('selectLocationType');
+	const selectedType = selectType.options[selectType.selectedIndex];
+	const type = selectedType.value;
+	//const label = selectedType.textContent;
 
-  //Get all the input fields
-  const xCord = document.getElementById('xCord');
-  const yCord = document.getElementById('yCord');
-  const zCord = document.getElementById('zCord');
-  const description = document.getElementById('description-input');
-  const owner = document.getElementById('owner-input');
-  const url = document.getElementById('url-input');
+	//Get all the input fields
+	const xCord = document.getElementById('xCord');
+	const yCord = document.getElementById('yCord');
+	const zCord = document.getElementById('zCord');
+	const description = document.getElementById('description-input');
+	const owner = document.getElementById('owner-input');
+	const url = document.getElementById('url-input');
 
-  //Get the icon dropdown
-  const selectIcon = document.getElementById('selectIconIndex');
-  const selectedIcon = selectIcon.options[selectIcon.selectedIndex];
-  const iconIndex = selectedIcon.value;
+	//Get the icon dropdown
+	const selectIcon = document.getElementById('selectIconIndex');
+	const selectedIcon = selectIcon.options[selectIcon.selectedIndex];
+	const iconIndex = selectedIcon.value;
 
-  //Set all the data about a location
-  const location = {type: type, x: xCord.value, y: yCord.value, z: zCord.value, description: description.value, owner: owner.value, url: url.value, iconIndex: iconIndex };
-  
-  // Create a new card & get the weather data from the server
-  const card = getItemCard(location);
+	//Set all the data about a location
+	const location = new MinecordLocation(type, xCord.value, yCord.value, zCord.value, description.value, owner.value, url.value, iconIndex);
 
-  renderLocation(card, {time: Date.now(), timezone: 'utc'})
+	// Create a new card & get the weather data from the server
+	const card = getItemCard(location);
 
-  /*
-  getLocationFromNetwork(type).then((forecast) => {
-    renderForecast(card, forecast);
-  });
-  */
+	renderLocation(card, { time: Date.now(), timezone: 'utc' })
 
-  // Save the updated list of locations.
-  const key = location.x + "|" + location.y + "|" + location.z;
-  minecordApp.selectedLocations[key] = location;
-  saveLocationList(minecordApp.selectedLocations);
+	/*
+	getLocationFromNetwork(type).then((forecast) => {
+	  renderForecast(card, forecast);
+	});
+	*/
 
-  //Update list of owners and save it and update the menu for next time
-  if(!(location.owner in minecordApp.owners)){
-	  minecordApp.owners[location.owner] = {count: 0};
-  }
-  minecordApp.owners[location.owner].count++;
-  saveOwnerList(minecordApp.owners);
-  updateOwnersList();
+	// Save the updated list of locations.
+	const key = location.getKey();
+	const exists = minecordApp.selectedLocations.hasKey(key);
+	if(exists){
+		console.log("Location: " + key + " exists so updating it.");
+	}
+	minecordApp.selectedLocations.insertItem(location);
+	minecordApp.selectedLocations.saveToStorage();
+
+	//Update list of owners and save it and update the menu for next time
+	if(!exists){
+		const ownersUpdated = minecordApp.owners.addOwner(location.owner);
+		if(ownersUpdated){
+			minecordApp.owners.saveToStorage();
+			onUpdatedOwnerList();
+		}
+	}
 }
 
 /**
@@ -96,21 +312,53 @@ function addLocation() {
  * @param {Event} evt
  */
 function removeLocation(evt) {
+	//Get the card
 	const parent = evt.srcElement.parentElement;
+
+	//Remove the card
 	parent.remove();
-	if (minecordApp.selectedLocations[parent.id]) {
 
-		//Update the owner list and save it and update the menu
-		const location = minecordApp.selectedLocations[parent.id];
-		if (minecordApp.owners[location.owner]) {
-			var owner = minecordApp.owners[location.owner];
-			owner.count = owner.count > 0 ? owner.count - 1 : 0;
+	//If the item was in our location list update the data behind
+	if (minecordApp.selectedLocations.hasKey(parent.id)) {
+
+		//Update the owner list, save it, and update the menu
+		const location = minecordApp.selectedLocations.get(parent.id);
+		const ownersUpdated = minecordApp.owners.removeOwner(location.owner);
+		if(ownersUpdated){
+			minecordApp.owners.saveToStorage();
+			onUpdatedOwnerList();
 		}
-		saveOwnerList(minecordApp.owners);
-		updateOwnersList();
 
-		delete minecordApp.selectedLocations[parent.id];
-		saveLocationList(minecordApp.selectedLocations);
+		//Remove the location
+		minecordApp.selectedLocations.removeItem(parent.id);
+		minecordApp.selectedLocations.saveToStorage();
+	}
+}
+
+/**
+ * Remove a location and card by it's key
+ * @param {String} key Element key/location key
+ */
+function removeLocationByKey(key) {
+
+	//If the item was in our location list update the data behind
+	if (minecordApp.selectedLocations.hasKey(key)) {
+
+		//Get the card
+		const parent = document.getElementById(key);
+		parent.remove();
+
+		//Update the owner list, save it, and update the menu
+		const location = minecordApp.selectedLocations.get(key);
+		const ownersUpdated = minecordApp.owners.removeOwner(location.owner);
+		if (ownersUpdated) {
+			minecordApp.owners.saveToStorage();
+			onUpdatedOwnerList();
+		}
+
+		//Remove the location
+		minecordApp.selectedLocations.removeItem(key);
+		minecordApp.selectedLocations.saveToStorage();
 	}
 }
 
@@ -136,12 +384,6 @@ function renderLocation(card, data) {
 	}
 	cardLastUpdatedElem.textContent = data.time;
 
-	const updatedLast = luxon.DateTime
-		.fromMillis(data.time)
-		//.setZone(data.timezone)
-		.toFormat('DDDD t');
-	card.querySelector('.date').textContent = updatedLast;
-
 	//Update location type icon
 	const locTypeLabel = card.querySelector('.info .loc-type-label');
 	const locTypeIconClass = getLocationTypeIconClass(locTypeLabel.textContent);
@@ -149,7 +391,7 @@ function renderLocation(card, data) {
 
 	//Update icon index icon
 	const iconIndex = card.querySelector('.info .icon-index-label').textContent;
-	const iconIndexClass = minecordApp.iconClasses[iconIndex];
+	const iconIndexClass = minecordApp.iconClasses[iconIndex] || "";
 	card.querySelector('.info .icon-index-name').textContent = iconIndexClass;
 	card.querySelector('.info .icon-index').className = `icon-index ${iconIndexClass}`;
 
@@ -164,11 +406,11 @@ function renderLocation(card, data) {
  * Get's the HTML element for the x-y-z data, or clones the template
  * and adds it to the DOM if we're adding a new item.
  *
- * @param {Object} location Location object
+ * @param {MinecordLocation} location Location object
  * @return {Element} The element for the location card.
  */
 function getItemCard(location) {
-	const id = location.x + "|" + location.y + "|" + location.z;
+	const id = location.getKey();
 	const card = document.getElementById(id);
 	if (card) {
 		return card;
@@ -176,6 +418,13 @@ function getItemCard(location) {
 	const newCard = document.getElementById('item-template').cloneNode(true);
 	newCard.querySelector('.location').textContent = location.x + "," + location.y + "," + location.z;
 	newCard.setAttribute('id', id);
+
+	//Set the time this item was last updated
+	const updatedLast = luxon.DateTime
+		.fromMillis(location.lastUpdated)
+		//.setZone(data.timezone)
+		.toFormat('DDDD t');
+	newCard.querySelector('.date').textContent = updatedLast;
 
 	//fill out the other data
 	newCard.querySelector('.description').textContent = location.description;
@@ -188,10 +437,14 @@ function getItemCard(location) {
 
 	newCard.querySelector('.info .icon-index-label').textContent = location.iconIndex;
 
-	newCard.querySelector('.remove-item')
-		.addEventListener('click', removeLocation);
+	//Register click events
+	newCard.querySelector('.remove-item').addEventListener('click', removeLocation);
+	newCard.querySelector('.edit-item').addEventListener('click', promptEditLocation);
+	
+	//Add the card and display it
 	document.querySelector('main').appendChild(newCard);
 	newCard.removeAttribute('hidden');
+
 	return newCard;
 }
 
@@ -263,24 +516,21 @@ function updateLocationTypes(locationTypes){
 	updateLocationTypeDropdown();
 
 	//Update all the cards
-	renderAllCards();
+	updateData();
 }
 
 function updateLocationTypeDropdown(){
 	//Update the add dialogue
 	const selectType = document.getElementById('selectLocationType');
 	
-	//Get our html options
-	let output = "";
-	Object.keys(minecordApp.locationTypes).forEach((key) => {
+	//Update the select menu options
+	selectType.innerHTML = Object.keys(minecordApp.locationTypes)
+	.map((key) => {
 		const type = minecordApp.locationTypes[key];
 		//const iconClass = getLocationTypeIconClass(type);
 
-		output += `<option value="${key}" title="${type.description}">${key}</option>`;
-	});
-
-	//update the actual select menu
-	selectType.innerHTML = output;
+		return `<option value="${key}" title="${type.description}">${key}</option>`;
+	}).join('\n');
 }
 
 function updateIconClasses(iconClasses){
@@ -290,39 +540,53 @@ function updateIconClasses(iconClasses){
 	updateIconIndexDropdown();
 
 	//Update all the cards
-	renderAllCards();
+	updateData();
 }
 
 function updateIconIndexDropdown(){
 	//Update the add dialogue
 	const selectIconIndex = document.getElementById('selectIconIndex');
 	
-	//Get our html options
-	let output = "";
-	minecordApp.iconClasses.forEach((iconClass, i) => {
-		output += `<option value="${i}"><div class="icon-index ${iconClass}"></div> ${iconClass}</option>`;
-	});
-
-	//update the actual select menu
-	selectIconIndex.innerHTML = output;
+	//Update our select menu with our list of options
+	selectIconIndex.innerHTML = minecordApp.iconClasses
+	.map((iconClass, i) => `<option value="${i}"><div class="icon-index ${iconClass}"></div> ${iconClass}</option>`
+	).join('\n');
 }
 
-function updateOwnersList(){
+/**
+ * Update the owners autocomplete to show the new owner list sorted by number of uses
+ */
+function onUpdatedOwnerList(){
 	//Update the add dialogue
 	const ownerList = document.getElementById('owners');
 	
-	//Get our html options
-	let output = "";
-	Object.keys(minecordApp.owners)
-	.sort((a,b) => {return minecordApp.owners[a].count - minecordApp.owners[b].count;})
-	.forEach((key) => {
-		const owner = minecordApp.owners[key];
+	//Update the autocomplete with our list of owners
+	ownerList.innerHTML = minecordApp.owners.getSortedEntries()
+	.map(([ownerName, owner]) => `<option value="${ownerName}">`).join('\n');
+}
 
-		output += `<option value="${key}">`;
-	});
+/**
+ * Render the new map settings in the UI
+ */
+function onUpdatedMapSettings(){
+	const mapSettings = minecordApp.mapSettings;
+	const settingsCard = document.getElementById("mapSettings");
 
-	//update the actual menu
-	ownerList.innerHTML = output;
+	//All text and checkbox settings
+	settingsCard.querySelector(".setting-title").textContent = mapSettings.title;
+	settingsCard.querySelector(".setting-blurb").innerHTML = mapSettings.blurb;
+	settingsCard.querySelector(".setting-range").textContent = mapSettings.range;
+	settingsCard.querySelector(".setting-show-origin").textContent = mapSettings.showOrigin ? "Show" : "Don't Show";
+	settingsCard.querySelector(".setting-origin").textContent = mapSettings.origin.x + ", " + mapSettings.origin.z;
+	settingsCard.querySelector(".setting-show-scale").textContent = mapSettings.showScale ? "Scale" : "No Scale";
+	settingsCard.querySelector(".setting-show-coordinates").textContent = mapSettings.showCoordinates ? "Show Coordinates" : "Hide Coordinates";
+	settingsCard.querySelector(".setting-hide-label-above").innerHTML = `<b>Hide Labels Above:</b> <a>${mapSettings.hideLabelsAbove}</a>`;
+	const iconFileGroup = settingsCard.querySelector(".setting-custom-icon-file");
+	iconFileGroup.querySelector(".image-path").textContent = mapSettings.customIconFile || "";
+	const img = iconFileGroup.querySelector("figure > img");
+	img.src = mapSettings.customIconFile || "";
+	img.alt = mapSettings.customIconFile || "";
+	iconFileGroup.querySelector("figure > figcaption").textContent = mapSettings.customIconFile || "";
 }
 
 function loadLocationTypes(){
@@ -413,8 +677,7 @@ function getLocationTypeIconClass(locationType){
  */
 function updateData() {
 
-	Object.keys(minecordApp.selectedLocations).forEach((key) => {
-		const location = minecordApp.selectedLocations[key];
+	for(let [key, location] of Object.entries(minecordApp.selectedLocations)){
 		const card = getItemCard(location);
 		// CODELAB: Add code to call getForecastFromCache
 
@@ -425,80 +688,10 @@ function updateData() {
 			  renderForecast(card, forecast);
 			});
 			*/
-	});
-}
-
-function renderAllCards() {
-	Object.keys(minecordApp.selectedLocations).forEach((key) => {
-		const location = minecordApp.selectedLocations[key];
-
-		//This should get an existing card
-		const card = getItemCard(location);
-
+		//Re-render the card (icons and everything)
 		renderLocation(card, { time: Date.now(), timezone: 'utc' });
-	});
-}
-
-/**
- * Saves the list of locations.
- *
- * @param {Object} locations The list of locations to save.
- */
-function saveLocationList(locations) {
-  const data = JSON.stringify(locations);
-  localStorage.setItem('locationList', data);
-}
-
-/**
- * Loads the list of saved location.
- *
- * @return {Object}
- */
-function loadLocationList() {
-  let locations = localStorage.getItem('locationList');
-  if (locations) {
-    try {
-      locations = JSON.parse(locations);
-    } catch (ex) {
-      locations = {};
-    }
-  }
-  if (!locations || Object.keys(locations).length === 0) {
-    const key = '0|0|0';
-    locations = {};
-    locations[key] = {type: 'WitchHut', x: 0, y: 0, z: 0, description: "Some cool fake chest", owner: "User", url: "", iconIndex: 43 };
-  }
-  return locations;
-}
-
-/**
- * Saves list of owners we have typed in before
- * @param {Object} owners Map of owners we have previously typed in
- */
-function saveOwnerList(owners){
-	const data = JSON.stringify(owners);
-	localStorage.setItem('ownerList', data);
-}
-
-/**
- * Loads the list of owners we have typed in before
- *
- * @return {Object} map of owners typed in
- */
-function loadOwnerList() {
-	let owners = localStorage.getItem('ownerList');
-	if (owners) {
-	  try {
-		owners = JSON.parse(owners);
-	  } catch (ex) {
-		owners = {};
-	  }
 	}
-	if (!owners || Object.keys(owners).length === 0) {
-		owners = {"MusicMonkey5555": {count: 1}};
-	}
-	return owners;
-  }
+}
 
 /**
  * Initialize the app, gets the list of locations from local storage, then
@@ -506,11 +699,15 @@ function loadOwnerList() {
  */
 function init() {
 	// Get the location list
-	minecordApp.selectedLocations = loadLocationList();
+	minecordApp.selectedLocations = LocationList.loadFromStorage();
 
 	//Get the owner list
-	minecordApp.owners = loadOwnerList();
-	updateOwnersList();
+	minecordApp.owners = OwnerList.loadFromStorage();
+	onUpdatedOwnerList();
+
+	//Get the map settings
+	minecordApp.mapSettings = MapSettings.loadFromStorage();
+	onUpdatedMapSettings();
 
 	//add all our cards
 	updateData();
@@ -521,19 +718,32 @@ function init() {
 
 	// Set up the event handlers for all of the buttons.
 	document.getElementById('butRefresh').addEventListener('click', updateData);
-	document.getElementById('butAdd').addEventListener('click', toggleAddDialog);
-	document.getElementById('butDialogCancel').addEventListener('click', toggleAddDialog);
-	document.getElementById('butDialogAdd').addEventListener('click', addLocation);
+	document.getElementById('butAdd').addEventListener('click', promptAddLocation);
+	document.getElementById('butDialogCancel').addEventListener('click', (event) => {
+		//Clear out what we were editing
+		document.getElementById('editLocationKey').textContent = "";
+		document.getElementById('editLocationKey').classList.remove('visible');
+
+		//Close the menu
+		minecordApp.addDialogContainer.classList.remove('visible');
+	});
 
 	// Set up the event handlers for dialogue
 	document.getElementById("selectLocationType").addEventListener("change", (event) => {
+		//Update icon when we change type
 		const locationType = minecordApp.locationTypes[event.target.value];
-		document.getElementById("selectIconIndex").value = locationType.iconIndex;
+		const iconSelect = document.getElementById("selectIconIndex");
+		iconSelect.value = locationType.iconIndex;
+		iconSelect.dispatchEvent(new Event('change'));
 	});
 	document.getElementById("selectIconIndex").addEventListener("change", (event) => {
+		//Update preview icon
 		const iconClass = minecordApp.iconClasses[event.target.value];
 		document.getElementById("selectIconIndexIcon").className = `icon-index ${iconClass}`;
 	});
+	document.getElementById("xCord").addEventListener("input", checkCoordinates);
+	document.getElementById("yCord").addEventListener("input", checkCoordinates);
+	document.getElementById("zCord").addEventListener("input", checkCoordinates);
 }
 
 init();

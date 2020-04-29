@@ -93,6 +93,10 @@ body {
 	width: 24px;
 }
 
+.header button:hover{
+	opacity: 1;
+}
+
 .header #butRefresh {
 	background: url(/images/refresh.svg) center center no-repeat;
 }
@@ -196,10 +200,24 @@ body {
 /**
   Location types
 */
+.icon-outer-wrapper{
+	display: inline-block;
+	margin: auto;
+}
+.icon-outer-wrapper .frame {
+	width: 32px;
+	height: 32px;
+	vertical-align: middle;
+	text-align: center;
+	display: table-cell;
+}
+
 .loc-type,
 .icon-index {
 	background-repeat: no-repeat;
 	background-size: contain;
+	display: block;
+	margin: 0 auto;
 }
 
 .loc-type.Chest,
@@ -519,7 +537,7 @@ body {
 
 .loc-type.Spawn,
 .icon-index.Spawn {
-	width: 32px;
+	width: 20px;
 	height: 32px;
 	background: url(/images/glyphs.png) -1286px 0px;
 }
@@ -602,6 +620,23 @@ body {
 	pointer-events: auto;
 }
 
+#cordError {
+	color: darkred;
+	min-height: 10px;
+	position: relative;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.333s cubic-bezier(0, 0, 0.21, 1);
+	will-change: opacity;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#cordError.visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
 .dialog {
 	background: #fff;
 	border-radius: 2px;
@@ -635,6 +670,33 @@ body {
 input,
 textarea {
 	width: 100%;
+	padding-bottom: 5px;
+}
+
+.select-group,
+.coord-group {
+	width: 100%;
+	display: flex;
+}
+
+.select-group .icon-outer-wrapper {
+	order: 1;
+	align-self: center;
+}
+.select-group select {
+	order: 2;
+	align-self: center;
+	margin-left: 5px;
+}
+
+.coord-group input {
+	align-self: center;
+	justify-content: space-evenly;
+}
+
+.dialog-body textarea {
+	min-width: 100px;
+	min-height: 25px;
 }
 
 .dialog-buttons {
@@ -674,6 +736,11 @@ textarea {
 	font-size: x-large;
 }
 
+.item-card .remove-item:hover {
+	cursor: pointer;
+	color: grey;
+}
+
 .item-card .location {
 	font-size: 1.75em;
 }
@@ -692,17 +759,46 @@ textarea {
 
 .item-card .info .loc-type-label {
 	font-size: 1.25em;
+	padding-left: 10px;
+	margin: auto;
 }
 
 .item-card .info .icon-index-label,
+.item-card .info .icon-index-divider,
 .item-card .info .icon-index-name {
 	font-size: 1.25em;
+	padding-right: 5px;
+	margin: auto;
 }
 
 .item-card .info .url {
 	flex-grow: 1;
 	font-size: 1.25em;
 }
+
+.item-card .settings {
+	display: inline-flex;
+	width:100%;
+	font-size: 1.25em;
+}
+
+.item-card .settings .setting-group {
+	display: inline-flex;
+	width:100%;
+	flex-direction: row;
+	align-items: center;
+	align-content: center;
+	flex-wrap: nowrap;
+}
+
+.item-card .settings .setting-group .setting-origin {
+	order: 1;
+}
+
+.item-card .settings .setting-group .setting-show-origin {
+	order: 2;
+}
+
 
 /**
  * Media query to adjust size of content for small screens

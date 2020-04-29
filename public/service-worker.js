@@ -18,7 +18,7 @@
 'use strict';
 
 // Update cache names any time any of the cached files change.
-const CACHE_NAME = 'static-cache-v2';
+const CACHE_NAME = 'static-cache-v3';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
 // Add list of files to cache here.
@@ -28,6 +28,13 @@ const FILES_TO_CACHE = [
 	'/scripts/app.js',
 	'/scripts/install.js',
 	'/scripts/luxon-1.11.4.js',
+	'/scripts/modules/base-class.js',
+	'/scripts/modules/storable.js',
+	'/scripts/modules/location-list.js',
+	'/scripts/modules/map-settings.js',
+	'/scripts/modules/minecord-location.js',
+	'/scripts/modules/owner.js',
+	'/scripts/modules/owner-list.js',
 	'/styles/inline.css',
 	'/images/add.svg',
 	'/images/install.svg',
