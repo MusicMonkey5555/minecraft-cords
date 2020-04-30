@@ -260,6 +260,7 @@ body {
 	width: 14px;
 	height: 19px;
 	background: url(/images/glyphs.png) -73px -7px;
+	background-color: black;
 }
 
 .loc-type.WhitchHut,
