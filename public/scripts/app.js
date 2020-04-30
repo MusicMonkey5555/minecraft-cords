@@ -436,7 +436,27 @@ function getItemCard(location) {
 	//Set the location type text
 	newCard.querySelector('.info .loc-type-label').textContent = location.type;
 
-	newCard.querySelector('.url').textContent = location.url;
+	const urlCtrl = newCard.querySelector('.url');
+	if(typeof location.url !== 'undefined' && location.url != null && location.url.length > 0){
+		const fileName = /[\w-]+\.(jpg|png|txt)/g.exec(location.url);
+		//const displayedFileName =  fileName != null ? filename[0] : location.url;
+		let displayedName = location.url.substr(0, 10);
+		let fileExtention = "";
+		if(fileName != null && fileName.length > 0){
+			displayedName = fileName[0];
+			fileExtention = fileName[1] || "";
+		}
+		//Check for image
+		if(["png","jpeg","gif"].includes(fileExtention)){
+			urlCtrl.innerHTML = `<figure>
+			<img src="${location.url}" alt="${displayedName}" style="width:100%">
+		  </figure>`;
+		}
+		else
+		{
+			urlCtrl.innerHTML = `<a href="${location.url}">${displayedName}</a>`;
+		}
+	}
 
 	newCard.querySelector('.info .icon-index-label').textContent = location.iconIndex;
 
