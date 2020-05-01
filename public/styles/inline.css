@@ -197,6 +197,10 @@ body {
 	}
 }
 
+.hide-small {
+	display: initial;
+}
+
 /**
   Location types
 */
@@ -212,12 +216,21 @@ body {
 	display: table-cell;
 }
 
+.icon-outer-wrapper .frame .loc-type {
+	padding-right: 10px;
+}
+
 .loc-type,
 .icon-index {
 	background-repeat: no-repeat;
 	background-size: contain;
 	display: block;
 	margin: 0 auto;
+}
+
+.loc-type.empty,
+.icon-index.empty {
+	display: none;
 }
 
 .loc-type.Chest,
@@ -742,6 +755,55 @@ textarea {
 	color: grey;
 }
 
+.btn {
+	position: relative;
+
+	display: block;
+	padding: 0px;
+	margin: 5px;
+	
+	border-width: 2px;
+	border-color: #444;
+	outline: none;
+	outline-color: #444;
+	border-radius: 2px;
+	border-style: solid;
+	/*box-shadow: 0 1px 4px rgb(0, 0, 0, 0.6);*/
+
+	background-color: transparent;
+	color: #444;
+
+	transition: all .3s;
+
+	cursor: pointer;
+}
+
+.btn:active:before {
+	width: 120%;
+	padding-top: 120%;
+	border-color: #444;
+	outline-color: #444;
+	
+	transition: width .2s ease-out, padding-top .2s ease-out;
+  }
+
+.btn:hover,
+.btn:focus {
+	color: grey;
+	border-color: grey;
+	outline-color: grey;
+}
+.btn > * {
+	position:relative;
+}
+
+.btn span {
+	display: block;
+	padding: 7px 12px;
+	cursor: pointer;
+	pointer-events: none;
+}
+
 .item-card .location {
 	font-size: 1.75em;
 }
@@ -756,11 +818,27 @@ textarea {
 
 .item-card .info {
 	display: flex;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+}
+
+.icon-group {
+	display:flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	flex-direction: row;
+
+	opacity: 1;
+	transition: opacity 0.333s cubic-bezier(0, 0, 0.21, 1);
+	will-change: opacity;
+}
+
+.icon-group.hide {
+	opacity: 0;
 }
 
 .item-card .info .loc-type-label {
 	font-size: 1.25em;
-	padding-left: 10px;
 	margin: auto;
 }
 
@@ -775,6 +853,7 @@ textarea {
 .item-card .info .url {
 	flex-grow: 1;
 	font-size: 1.25em;
+	margin: auto;
 }
 
 .item-card .settings {
@@ -815,5 +894,13 @@ textarea {
 	.item-card .info .loc-type,
 	.item-card .info .icon-index {
 		font-size: 3em;
+	}
+
+	.hide-small {
+		display: none;
+	}
+
+	.icon-group {
+		flex-direction: column;
 	}
 }

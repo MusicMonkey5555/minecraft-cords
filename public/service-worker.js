@@ -18,7 +18,7 @@
 'use strict';
 
 // Update cache names any time any of the cached files change.
-const CACHE_NAME = 'static-cache-v3';
+const CACHE_NAME = 'static-cache-v4';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
 // Add list of files to cache here.
@@ -35,6 +35,7 @@ const FILES_TO_CACHE = [
 	'/scripts/modules/minecord-location.js',
 	'/scripts/modules/owner.js',
 	'/scripts/modules/owner-list.js',
+	'/scripts/modules/color.js',
 	'/styles/inline.css',
 	'/images/add.svg',
 	'/images/install.svg',

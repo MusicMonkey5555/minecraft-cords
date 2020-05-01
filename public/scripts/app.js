@@ -21,6 +21,7 @@ import LocationList from './modules/location-list.js';
 import MapSettings from './modules/map-settings.js';
 import OwnerList from './modules/owner-list.js';
 import MinecordLocation from './modules/minecord-location.js';
+import Color from './modules/color.js';
 
 /**
  * A location type
@@ -148,7 +149,7 @@ function setLocationPrompt(location){
 	  
 		//Get the icon dropdown
 		const selectIcon = document.getElementById('selectIconIndex');
-		selectIcon.value = location.iconIndex;
+		selectIcon.value = location.iconIndex || "";
 		selectIcon.dispatchEvent(new Event('change'));
 
 		return true;
@@ -390,18 +391,58 @@ function renderLocation(card, data) {
 	//Update location type icon
 	const locTypeLabel = card.querySelector('.info .loc-type-label');
 	const locTypeIconClass = getLocationTypeIconClass(locTypeLabel.textContent);
-	card.querySelector('.info .loc-type').className = `loc-type ${locTypeIconClass}`;
+	const locTypeDiv = card.querySelector('.info .loc-type');
+	locTypeDiv.className = `loc-type ${locTypeIconClass}`;
+	updateIconWrapper(locTypeDiv);
 
 	//Update icon index icon
 	const iconIndex = card.querySelector('.info .icon-index-label').textContent;
-	const iconIndexClass = minecordApp.iconClasses[iconIndex] || "";
-	card.querySelector('.info .icon-index-name').textContent = iconIndexClass;
-	card.querySelector('.info .icon-index').className = `icon-index ${iconIndexClass}`;
+	const iconIndexClass = minecordApp.iconClasses[iconIndex] || "empty";
+	const iconIndexNameDiv = card.querySelector('.info .icon-index-name');
+	if(iconIndexClass === "empty"){
+		iconIndexNameDiv.parentElement.classList.add('hide');
+	} else {
+		iconIndexNameDiv.parentElement.classList.remove('hide');
+	}
+
+	iconIndexNameDiv.textContent = iconIndexClass;
+	const iconDiv = card.querySelector('.info .icon-index');
+	iconDiv.className = `icon-index ${iconIndexClass}`;
+	updateIconWrapper(iconDiv);
 
 	// If the loading spinner is still visible, remove it.
 	const spinner = card.querySelector('.card-spinner');
 	if (spinner) {
 		card.removeChild(spinner);
+	}
+}
+
+function updateIconWrapper(iconElement){
+	if(iconElement instanceof HTMLElement && 
+		iconElement.parentElement && 
+		iconElement.parentElement.parentElement && 
+		iconElement.parentElement.parentElement.classList.contains('icon-outer-wrapper'))
+	{
+		const wrapperDiv = iconElement.parentElement.parentElement;
+		if(iconElement.classList.contains('empty')){
+			wrapperDiv.style.display = "none";
+		}
+		else
+		{
+			//Make sure we display as default
+			wrapperDiv.style.display = null;
+
+			//Set the background color to the same color (if clear, then clear out background color style)
+			const iconStyle = window.getComputedStyle(iconElement);
+			const color = Color.fromString(iconStyle.backgroundColor);
+			if(color.a == null || color.a <= 0.0){
+				wrapperDiv.style.backgroundColor = null;
+			}
+			else
+			{
+				wrapperDiv.style.backgroundColor = iconStyle.backgroundColor;
+			}
+		}
 	}
 }
 
@@ -446,7 +487,10 @@ function getItemCard(location) {
 			displayedName = fileName[0];
 			fileExtention = fileName[1] || "";
 		}
+
+		urlCtrl.innerHTML = `<a href="${location.url}">${displayedName}</a>`;
 		//Check for image
+		/*
 		if(["png","jpeg","gif"].includes(fileExtention)){
 			urlCtrl.innerHTML = `<figure>
 			<img src="${location.url}" alt="${displayedName}" style="width:100%">
@@ -456,6 +500,7 @@ function getItemCard(location) {
 		{
 			urlCtrl.innerHTML = `<a href="${location.url}">${displayedName}</a>`;
 		}
+		*/
 	}
 
 	newCard.querySelector('.info .icon-index-label').textContent = location.iconIndex;
@@ -574,7 +619,8 @@ function updateIconIndexDropdown(){
 	const selectIconIndex = document.getElementById('selectIconIndex');
 	
 	//Update our select menu with our list of options
-	selectIconIndex.innerHTML = minecordApp.iconClasses
+	selectIconIndex.innerHTML = '<option value=""><div class="icon-index empty"></div> None</option>' + 
+	minecordApp.iconClasses
 	.map((iconClass, i) => `<option value="${i}"><div class="icon-index ${iconClass}"></div> ${iconClass}</option>`
 	).join('\n');
 
@@ -689,7 +735,7 @@ function getLocationTypeIconClass(locationType){
 	locationType = (locationType || "").trim();
 
 	//Setup variable to return
-	var iconClass = "";
+	var iconClass = "empty";
 
 	if(minecordApp.locationTypes.hasOwnProperty(locationType)){
 		const type = minecordApp.locationTypes[locationType];
@@ -767,8 +813,10 @@ function init() {
 	});
 	document.getElementById("selectIconIndex").addEventListener("change", (event) => {
 		//Update preview icon
-		const iconClass = minecordApp.iconClasses[event.target.value];
-		document.getElementById("selectIconIndexIcon").className = `icon-index ${iconClass}`;
+		const iconClass = minecordApp.iconClasses[event.target.value] || "empty";
+		const iconDiv = document.getElementById("selectIconIndexIcon");
+		iconDiv.className = `icon-index ${iconClass}`;
+		updateIconWrapper(iconDiv);
 	});
 	document.getElementById("xCord").addEventListener("input", checkCoordinates);
 	document.getElementById("yCord").addEventListener("input", checkCoordinates);
