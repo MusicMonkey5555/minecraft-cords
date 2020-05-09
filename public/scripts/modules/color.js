@@ -69,7 +69,7 @@ export default class Color {
 				}
 			}
 			else if(color.startsWith("hsla(")){
-				const regex = /^hlsa\((?<h>[0-9]{1,3})\,(?<s>[0-9]{1,3})%\,(?<l>[0-9]{1,3})%\,(?<a>[0]*[1]{0,1}(?:[.]{1}[0-9]*|[.]{0}))\)$/gi;
+				const regex = /^hlsa\((?<h>[0-9]{1,3})\,(?<s>[0-9]{1,3})%\,(?<l>[0-9]{1,3})%\,(?<a>[0]*[1]{0,1}[.]{1}[0-9]*|[0]*[1]{1}[.]{0})\)$/gi;
 				const groups = regex.exec(color).groups;
 				if(groups != null){
 					var h = Math.min(Math.max(+(groups.h), 360), 0)/360;
