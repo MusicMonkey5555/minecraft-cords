@@ -319,24 +319,8 @@ function removeLocation(evt) {
 	//Get the card
 	const parent = evt.srcElement.parentElement;
 
-	//Remove the card
-	parent.remove();
-
-	//If the item was in our location list update the data behind
-	if (minecordApp.selectedLocations.hasKey(parent.id)) {
-
-		//Update the owner list, save it, and update the menu
-		const location = minecordApp.selectedLocations.get(parent.id);
-		const ownersUpdated = minecordApp.owners.removeOwner(location.owner);
-		if(ownersUpdated){
-			minecordApp.owners.saveToStorage();
-			onUpdatedOwnerList();
-		}
-
-		//Remove the location
-		minecordApp.selectedLocations.removeItem(parent.id);
-		minecordApp.selectedLocations.saveToStorage();
-	}
+	//Remove the actul card and location from our data
+	removeLocationByKey(parent.id);
 }
 
 /**
@@ -344,13 +328,14 @@ function removeLocation(evt) {
  * @param {String} key Element key/location key
  */
 function removeLocationByKey(key) {
+	//Get the card
+	const parent = document.getElementById(key);
+	if(parent){
+		parent.remove();
+	}
 
 	//If the item was in our location list update the data behind
 	if (minecordApp.selectedLocations.hasKey(key)) {
-
-		//Get the card
-		const parent = document.getElementById(key);
-		parent.remove();
 
 		//Update the owner list, save it, and update the menu
 		const location = minecordApp.selectedLocations.get(key);
@@ -479,28 +464,29 @@ function getItemCard(location) {
 
 	const urlCtrl = newCard.querySelector('.url');
 	if(typeof location.url !== 'undefined' && location.url != null && location.url.length > 0){
-		const fileName = /[\w-]+\.(jpg|png|txt)/g.exec(location.url);
-		//const displayedFileName =  fileName != null ? filename[0] : location.url;
-		let displayedName = location.url.substr(0, 10);
+		const urlParse = /(?<protocol>\w*)\:\/\/(?:(?:(?<thld>[\w\-]*)(?:\.))?(?<sld>[\w\-]*))\.(?<tld>\w*)(?:\:(?<port>\d*))?.*\/(?<filename>[\w-]+)\.(?<ext>jpg|png|txt)/g.exec(location.url);
+		let displayedName = location.url.substr(-10);
 		let fileExtention = "";
-		if(fileName != null && fileName.length > 0){
-			displayedName = fileName[0];
-			fileExtention = fileName[1] || "";
+		let domain = "";
+		if(urlParse != null && urlParse.length > 0 && urlParse.groups){
+			displayedName = urlParse.groups["filename"] || displayedName;
+			fileExtention = urlParse.groups["ext"] || "";
+			if(urlParse.groups["sld"] && urlParse.groups["tld"]){
+				domain = (urlParse.groups["thld"] ? urlParse.groups["thld"] + "." : "") + urlParse.groups["sld"] + "." + urlParse.groups["tld"];
+			}
 		}
-
-		urlCtrl.innerHTML = `<a href="${location.url}">${displayedName}</a>`;
-		//Check for image
-		/*
-		if(["png","jpeg","gif"].includes(fileExtention)){
+		if(domain === "dropbox.com"){
+			urlCtrl.innerHTML = `<a href="${location.url}" class="dropbox-embed" data-height="300px" data-width="500px"></a>`;
+		}
+		else if(domain === "dl.dropboxusercontent.com" && ["png","jpeg","gif"].includes(fileExtention)){
 			urlCtrl.innerHTML = `<figure>
-			<img src="${location.url}" alt="${displayedName}" style="width:100%">
-		  </figure>`;
+				<img src="${location.url}" alt="${displayedName}">
+				<figcaption><a href="${location.url}" target="_blank">${displayedName}</a></figcaption>
+			</figure>`;
 		}
-		else
-		{
-			urlCtrl.innerHTML = `<a href="${location.url}">${displayedName}</a>`;
+		else{
+			urlCtrl.innerHTML = `<a href="${location.url}" target="_blank">${displayedName}</a>`;
 		}
-		*/
 	}
 
 	newCard.querySelector('.info .icon-index-label').textContent = location.iconIndex;

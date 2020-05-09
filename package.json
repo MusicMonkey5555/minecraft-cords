@@ -10,6 +10,7 @@
   "dependencies": {
     "express": "^4.16.4",
     "express-http-to-https": "^1.1.4",
+    "helmet": "^3.22.0",
     "node-fetch": "^2.3.0"
   },
   "engines": {
@@ -26,8 +27,8 @@
   "keywords": [
     "progressive-web-app",
     "pwa",
-	"installable web app",
-	"mincraft",
-	"coordinates"
+    "installable web app",
+    "mincraft",
+    "coordinates"
   ]
 }

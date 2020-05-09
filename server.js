@@ -19,6 +19,7 @@
 'use strict';
 
 const express = require('express');
+const helmet = require('helmet');
 const fetch = require('node-fetch');
 const fs = require('fs');
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
@@ -238,6 +239,26 @@ function startServer() {
 
   const locationTypesContent = fs.readFileSync('public/data/LocationTypes.json');
   AppData.LocationTypes = JSON.parse(locationTypesContent);
+
+  app.use(helmet());
+  app.use(helmet.contentSecurityPolicy({
+	  directives: {
+		defaultSrc: ["'self'"],
+		scriptSrc: ["'self'","https://www.dropbox.com/static/api/2/dropins.js","'unsafe-inline'"],
+		styleSrc: ["'self'","'unsafe-inline'"], 
+		fontSrc: ["'self'", "data:"],
+		imgSrc: ["'self'","https://dl.dropboxusercontent.com"],  
+		mediaSrc: ["'none'"],  
+		frameSrc: ["https://www.dropbox.com/"] 
+	  },
+	  setAllHeaders: true
+  }));
+
+  //cookie security for production: only via https
+if (app.get('env') === 'production') {
+    app.set('trust proxy', 1) // trust first proxy
+    sess.cookie.secure = true // serve secure cookies
+}
 
   // Redirect HTTP to HTTPS,
   app.use(redirectToHTTPS([/localhost:(\d{4})/], [], 301));
