@@ -37,6 +37,10 @@ export default class MinecordLocation extends BaseClass {
 	 * @see {@link http://buildingwithblocks.info/index_expanded.html#locationHref_heading|href}
 	 */
 	url = "";
+	/**
+	 * Url meta data like dropbox info
+	 */
+	urlMeta = null;
 	/** 
 	 * Index to use for the icon for this location
 	 * @see {@link http://buildingwithblocks.info/index_expanded.html#locationIconIndex_heading|icon-index}
@@ -59,7 +63,7 @@ export default class MinecordLocation extends BaseClass {
 	 * @param {String} url Url for this location (such as image of it)
 	 * @param {Number} iconIndex Icon index of icon to use for the location when displaying it on the map
 	 */
-	constructor(type = "", x = null, y = null, z = null, description = "", owner = "", url = "", iconIndex = null) {
+	constructor(type = "", x = null, y = null, z = null, description = "", owner = "", url = "", iconIndex = null, urlMeta = null) {
 		super();
 		this.type = type;
 		this.x = x;
@@ -69,6 +73,7 @@ export default class MinecordLocation extends BaseClass {
 		this.owner = owner;
 		this.url = url;
 		this.iconIndex = iconIndex;
+		this.urlMeta = urlMeta;
 		this.lastUpdated = Date.now();
 	}
 

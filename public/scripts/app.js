@@ -146,6 +146,7 @@ function setLocationPrompt(location){
 		description.value = location.description;
 		owner.value = location.owner;
 		url.value = location.url;
+		url.dataset["dropbox"] = location.urlMeta ? JSON.stringify(location.urlMeta) : null;
 	  
 		//Get the icon dropdown
 		const selectIcon = document.getElementById('selectIconIndex');
@@ -271,6 +272,7 @@ function addLocation() {
 	const description = document.getElementById('description-input');
 	const owner = document.getElementById('owner-input');
 	const url = document.getElementById('url-input');
+	const urlMeta = url.dataset["dropbox"] ? JSON.parse(url.dataset["dropbox"]) : null;
 
 	//Get the icon dropdown
 	const selectIcon = document.getElementById('selectIconIndex');
@@ -278,7 +280,7 @@ function addLocation() {
 	const iconIndex = selectedIcon.value;
 
 	//Set all the data about a location
-	const location = new MinecordLocation(type, xCord.value, yCord.value, zCord.value, description.value, owner.value, url.value, iconIndex);
+	const location = new MinecordLocation(type, xCord.value, yCord.value, zCord.value, description.value, owner.value, url.value, iconIndex, urlMeta);
 
 	// Create a new card & get the weather data from the server
 	const card = getItemCard(location);
@@ -787,6 +789,27 @@ function init() {
 
 		//Close the menu
 		minecordApp.addDialogContainer.classList.remove('visible');
+	});
+
+	document.getElementById('url-from-dropbox').addEventListener('click', (event) => {
+		if(Dropbox){
+			Dropbox.choose({
+				success: function(files){
+					document.getElementById('url-input').value = files[0].link;
+					document.getElementById('url-input').dataset["dropbox"] = JSON.stringify(files[0]);
+				},
+				cancel: function(){
+
+				},
+				// Optional. "preview" (default) is a preview link to the document for sharing,
+    			// "direct" is an expiring link to download the contents of the file. For more
+    			// information about link types, see Link types below.
+				linkType: "direct", //"preview"
+				multiselect: false,
+				extensions: ['.png','.jpeg','.gif','.txt','.csv','.json'],
+				folderselect: false,
+			});
+		}
 	});
 
 	// Set up the event handlers for dialogue
