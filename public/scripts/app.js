@@ -408,7 +408,7 @@ function renderLocation(card, data) {
 		
 		//How do display it
 		const useIframe = false;
-		const usePreview = mobile;
+		const usePreview = true;
 
 		//If it's an image then display the image
 		if(urlParts.isImage === true && ["dropbox","dropboxusercontent"].includes(urlParts.domain) && urlParts.tld === "com"){
@@ -417,13 +417,24 @@ function renderLocation(card, data) {
 			}
 			else {
 				//Make the dropbox link a download so it can be in a img tag
-				const addr = new URL(url);
+				const addr = new URL(usePreview && urlMeta.thumbnailLink ? urlMeta.thumbnailLink : url);
 				if(addr.searchParams.has('dl')){
 					addr.searchParams.set('dl',1);
 				}
+				if(addr.searchParams.has('bounding_box')){
+					//Get all our possible preview image sizes
+					const boundingboxOptions = [75,256,800,1280,2048];
+
+					//Get the width of the card minus our padding
+					const width = card.offsetWidth - 10;
+
+					//Find the closes box size (bounding options) to our width
+					const bounding_box = boundingboxOptions.reduce((a,b) => { return Math.abs(b - width) < Math.abs(a - width) ? b : a;});
+					addr.searchParams.set('bounding_box', bounding_box);
+				}
 
 				//Get the items that make up the image
-				const imageSrc = usePreview === true && urlMeta.thumbnailLink ? urlMeta.thumbnailLink : addr.toString();
+				const imageSrc = addr.toString();
 
 				//Create the html to diplay it
 				urlCtrl.innerHTML = `<figure>
