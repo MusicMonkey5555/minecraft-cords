@@ -931,4 +931,9 @@ textarea {
 	.icon-group {
 		flex-direction: column;
 	}
+
+	.item-card .info .url > figure {
+		width: 100%;
+		margin: auto;
+	}
 }

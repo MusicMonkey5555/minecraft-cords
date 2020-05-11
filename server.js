@@ -244,10 +244,11 @@ function startServer() {
   app.use(helmet.contentSecurityPolicy({
 	  directives: {
 		defaultSrc: ["'self'"],
+		connectSrc: ["'self'","https://*.dropbox.com","https://*.dropboxusercontent.com"],
 		scriptSrc: ["'self'","https://www.dropbox.com/static/api/2/dropins.js","'unsafe-inline'"],
 		styleSrc: ["'self'","'unsafe-inline'"], 
 		fontSrc: ["'self'", "data:"],
-		imgSrc: ["'self'","https://dl.dropboxusercontent.com"],  
+		imgSrc: ["'self'","https://*.dropboxusercontent.com","https://*.dropbox.com"],  
 		mediaSrc: ["'none'"],  
 		frameSrc: ["https://www.dropbox.com/"] 
 	  },

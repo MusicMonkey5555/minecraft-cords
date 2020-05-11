@@ -397,6 +397,43 @@ function renderLocation(card, data) {
 	iconDiv.className = `icon-index ${iconIndexClass}`;
 	updateIconWrapper(iconDiv);
 
+	//Url stuff
+	const urlCtrl = card.querySelector('.url');
+	const urlMeta = urlCtrl.dataset["meta"] ? JSON.parse(urlCtrl.dataset["meta"]) : null;
+	const mobile = isMobile();
+	if(urlMeta){
+		const url = urlMeta.link;
+		const urlParts = parseUrl(url);
+		const fileName = urlMeta.name ? urlMeta.name : urlParts.filename + "." + urlParts.ext;
+		
+		//How do display it
+		const useIframe = false;
+		const usePreview = mobile;
+
+		//If it's an image then display the image
+		if(urlParts.isImage === true && ["dropbox","dropboxusercontent"].includes(urlParts.domain) && urlParts.tld === "com"){
+			if(useIframe && Dropbox.isBrowserSupported()){
+				urlCtrl.innerHTML = `<a href="${url}" class="dropbox-embed" data-height="300px" data-width="500px"></a>`;
+			}
+			else {
+				//Make the dropbox link a download so it can be in a img tag
+				const addr = new URL(url);
+				if(addr.searchParams.has('dl')){
+					addr.searchParams.set('dl',1);
+				}
+
+				//Get the items that make up the image
+				const imageSrc = usePreview === true && urlMeta.thumbnailLink ? urlMeta.thumbnailLink : addr.toString();
+
+				//Create the html to diplay it
+				urlCtrl.innerHTML = `<figure>
+					<img src="${imageSrc}" alt="${fileName}">
+					<figcaption><a href="${url}" target="_blank">${fileName}</a></figcaption>
+				</figure>`;
+			}
+		}
+	}
+
 	// If the loading spinner is still visible, remove it.
 	const spinner = card.querySelector('.card-spinner');
 	if (spinner) {
@@ -466,28 +503,16 @@ function getItemCard(location) {
 
 	const urlCtrl = newCard.querySelector('.url');
 	if(typeof location.url !== 'undefined' && location.url != null && location.url.length > 0){
-		const urlParse = /(?<protocol>\w*)\:\/\/(?:(?:(?<thld>[\w\-]*)(?:\.))?(?<sld>[\w\-]*))\.(?<tld>\w*)(?:\:(?<port>\d*))?.*\/(?<filename>[\w-]+)\.(?<ext>jpg|png|txt)/g.exec(location.url);
-		let displayedName = location.url.substr(-10);
-		let fileExtention = "";
-		let domain = "";
-		if(urlParse != null && urlParse.length > 0 && urlParse.groups){
-			displayedName = urlParse.groups["filename"] || displayedName;
-			fileExtention = urlParse.groups["ext"] || "";
-			if(urlParse.groups["sld"] && urlParse.groups["tld"]){
-				domain = (urlParse.groups["thld"] ? urlParse.groups["thld"] + "." : "") + urlParse.groups["sld"] + "." + urlParse.groups["tld"];
-			}
-		}
-		if(domain === "dropbox.com"){
-			urlCtrl.innerHTML = `<a href="${location.url}" class="dropbox-embed" data-height="300px" data-width="500px"></a>`;
-		}
-		else if(domain === "dl.dropboxusercontent.com" && ["png","jpeg","gif"].includes(fileExtention)){
-			urlCtrl.innerHTML = `<figure>
-				<img src="${location.url}" alt="${displayedName}">
-				<figcaption><a href="${location.url}" target="_blank">${displayedName}</a></figcaption>
-			</figure>`;
-		}
-		else{
-			urlCtrl.innerHTML = `<a href="${location.url}" target="_blank">${displayedName}</a>`;
+		const urlParts = parseUrl(location.url);
+		const meta = location.urlMeta;
+		const displayName = meta && meta.name && meta.name.length > 0 ? meta.name : urlParts.displayName + (urlParts.ext && urlParts.ext.length > 0 ? "." + urlParts.ext : "")
+
+		//Set default handling
+		urlCtrl.innerHTML = `<a href="${location.url}" target="_blank">${displayName}</a>`;
+
+		//Add the data if we have it
+		if(meta){
+			urlCtrl.dataset["meta"] = JSON.stringify(meta);
 		}
 	}
 
@@ -502,6 +527,65 @@ function getItemCard(location) {
 	newCard.removeAttribute('hidden');
 
 	return newCard;
+}
+
+/**
+ * Parse a url string into it's parts
+ * @param {string} url Url string to parse into parts
+ */
+function parseUrl(url){
+	const ulrParts = {
+		displayName: null,
+		filename: null,
+		ext: null,
+		protocol: null,
+		subdomain: null,
+		domain: null,
+		/**
+		 * Top Level domain
+		 */
+		tld: null,
+		port: null,
+		/**
+		 * If it's an image or a link to another map or null not sure
+		 * @type {?boolean}
+		 */
+		isImage: null
+	};
+
+	//Make sure param is valid
+	if(typeof url === 'string' && url != null && url.length > 0){
+		ulrParts.displayName = url.substr(-10);
+		
+		//Parse using regex
+		const regexArray = /(?<protocol>\w*)\:\/\/(?:(?:(?<thld>[\w\-]*)(?:\.))?(?<sld>[\w\-]*))\.(?<tld>\w*)(?:\:(?<port>\d*))?.*\/(?<filename>[\w-]+)\.(?<ext>bmp|cr2|gif|ico|ithmb|jpeg|jpg|nef|png|raw|svg|tif|tiff|wbmp|webp|txt|json|csv)/g.exec(url);
+		if(regexArray !== null && regexArray.length > 0 && regexArray.groups){
+			ulrParts.displayName = regexArray.groups["filename"] || displayedName;
+			ulrParts.filename = regexArray.groups["filename"];
+			ulrParts.ext = regexArray.groups["ext"] || "";
+			ulrParts.protocol = regexArray.groups["protocol"];
+			ulrParts.subdomain = regexArray.groups["thld"];
+			ulrParts.domain = regexArray.groups["sld"];
+			ulrParts.tld = regexArray.groups["tld"];
+			ulrParts.port = regexArray.groups["port"];
+		}
+	}
+
+	//Extra checks
+	if(ulrParts.ext){
+		ulrParts.isImage = ["txt","json","csv"].includes(ulrParts.ext) ? false : true;
+	}
+
+	return ulrParts;
+}
+
+/**
+ * Check if we are using a mobile browser or not
+ */
+function isMobile(){
+	let check = false;
+	(function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+	return check;
 }
 
 /**
@@ -804,7 +888,7 @@ function init() {
 				// Optional. "preview" (default) is a preview link to the document for sharing,
     			// "direct" is an expiring link to download the contents of the file. For more
     			// information about link types, see Link types below.
-				linkType: "direct", //"preview"
+				linkType: "preview", //"preview"
 				multiselect: false,
 				extensions: ['.png','.jpeg','.gif','.txt','.csv','.json'],
 				folderselect: false,
