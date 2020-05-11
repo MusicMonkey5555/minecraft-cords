@@ -40,6 +40,7 @@ const FILES_TO_CACHE = [
 	'/images/add.svg',
 	'/images/install.svg',
 	'/images/refresh.svg',
+	'/images/favicon.ico',
 	'/images/glyphs.png',
 	'/data/IconClasses.json',
 	'/data/LocationTypes.json',
