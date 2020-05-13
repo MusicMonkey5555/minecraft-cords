@@ -59,8 +59,13 @@ const minecordApp = {
 	 * @type {LocationList}
 	 */
 	selectedLocations: {},
+	
 	/** Dialogue used for editing and adding locations */
 	addDialogContainer: document.getElementById('addDialogContainer'),
+
+	/** Dialogue used for editing map settings */
+	setttingsDialogContainer: document.getElementById('setttingsDialogContainer'),
+
 	/** Spinner for the page */
 	pageSpinner: document.getElementById('pageSpinner'),
 	/**
@@ -84,7 +89,7 @@ const minecordApp = {
  * Check if the add/edit dialogue is visble or not
  */
 function isDialogueVisible(){
-	return minecordApp.addDialogContainer.classList.contains('visible');
+	return minecordApp.addDialogContainer.classList.contains('visible') || minecordApp.setttingsDialogContainer.classList.contains('visible');
 }
 
 /**
@@ -733,18 +738,133 @@ function onUpdatedMapSettings(){
 	//All text and checkbox settings
 	settingsCard.querySelector(".setting-title").textContent = mapSettings.title;
 	settingsCard.querySelector(".setting-blurb").innerHTML = mapSettings.blurb;
-	settingsCard.querySelector(".setting-range").textContent = mapSettings.range;
+	settingsCard.querySelector(".setting-range").innerHTML = `<b>Map Range:</b> <a>${mapSettings.range}</a>`;
 	settingsCard.querySelector(".setting-show-origin").textContent = mapSettings.showOrigin ? "Show" : "Don't Show";
 	settingsCard.querySelector(".setting-origin").textContent = mapSettings.origin.x + ", " + mapSettings.origin.z;
-	settingsCard.querySelector(".setting-show-scale").textContent = mapSettings.showScale ? "Scale" : "No Scale";
+	settingsCard.querySelector(".setting-show-scale").textContent = mapSettings.showScale ? "Show Scale" : "Hide Scale";
 	settingsCard.querySelector(".setting-show-coordinates").textContent = mapSettings.showCoordinates ? "Show Coordinates" : "Hide Coordinates";
 	settingsCard.querySelector(".setting-hide-label-above").innerHTML = `<b>Hide Labels Above:</b> <a>${mapSettings.hideLabelsAbove}</a>`;
+	settingsCard.querySelector(".setting-show-label-below").innerHTML = `<b>Show Labels Below:</b> <a>${mapSettings.showLabelsBelow}</a>`;
 	const iconFileGroup = settingsCard.querySelector(".setting-custom-icon-file");
 	iconFileGroup.querySelector(".image-path").textContent = mapSettings.customIconFile || "";
 	const img = iconFileGroup.querySelector("figure > img");
 	img.src = mapSettings.customIconFile || "";
 	img.alt = mapSettings.customIconFile || "";
 	iconFileGroup.querySelector("figure > figcaption").textContent = mapSettings.customIconFile || "";
+	
+	//Hide the image group if we don't have a custom icon file
+	if(!mapSettings.customIconFile){
+		iconFileGroup.style.display = "none";
+	} else {
+		iconFileGroup.style.display = null;
+	}
+
+	const oceanSrcGroup = settingsCard.querySelector(".setting-ocean-src");
+	oceanSrcGroup.querySelector(".image-path").textContent = mapSettings.oceanSrc || "";
+	const oceanImg = oceanSrcGroup.querySelector("figure > img");
+	oceanImg.src = mapSettings.oceanSrc || "";
+	oceanImg.alt = mapSettings.oceanSrc || "";
+	oceanSrcGroup.querySelector("figure > figcaption").textContent = mapSettings.oceanSrc || "";
+	
+	//Hide the image group if we don't have a ocean source file
+	if(!mapSettings.oceanSrc){
+		oceanSrcGroup.style.display = "none";
+	} else {
+		oceanSrcGroup.style.display = null;
+	}
+
+	const foundTheme = MapSettings.OceanThemes.find(theme => theme.theme === mapSettings.oceanTheme)
+	settingsCard.querySelector(".setting-ocean-theme").textContent = foundTheme ? foundTheme.title : mapSettings.oceanTheme;
+}
+
+/**
+ * Prompt to edit the settings
+ * @param {Event} evt Click event for settings edit
+ */
+function promptEditSettings(evt) {
+	//Don't do anything if we already have a dialog visible
+	if(!isDialogueVisible()){
+		const mapSettings = minecordApp.mapSettings;
+
+		//----Fill out the values in the menu----
+		
+		//Set all the input fields
+		document.getElementById('settingTitleEdit').value = mapSettings.title;
+		document.getElementById('settingBlurbEdit').value = mapSettings.blurb;
+		document.getElementById('settingRangeEdit').value = mapSettings.range;
+		document.getElementById('originXCord').value = mapSettings.origin.x;
+		document.getElementById('originZCord').value = mapSettings.origin.z;
+		document.getElementById('settingShowOriginCheck').checked = mapSettings.showOrigin;
+		document.getElementById('settingShowScaleCheck').checked = mapSettings.showScale;
+		document.getElementById('settingShowCoordinatesCheck').checked = mapSettings.showCoordinates;
+		document.getElementById('settingHideLabelAboveEdit').value = mapSettings.hideLabelsAbove;
+		document.getElementById('settingShowLabelBelowEdit').value = mapSettings.showLabelsBelow;
+
+		//Handle the url choosers
+		const customUrlInput = document.getElementById('settingCustomIconUrlEdit');
+		customUrlInput.value = mapSettings.customIconFile;
+		customUrlInput.dataset["dropbox"] = mapSettings.customIconMeta ? JSON.stringify(mapSettings.customIconMeta) : null;
+		const oceanSrcInput = document.getElementById('settingOceanSrcEdit');
+		oceanSrcInput.value = mapSettings.oceanSrc;
+		oceanSrcInput.dataset["dropbox"] = mapSettings.oceanSrcMeta ? JSON.stringify(mapSettings.oceanSrcMeta) : null;
+
+		// Populate the ocean theme optoins and get the selected ocean theme
+		const selectOceanTheme = document.getElementById('selectOceanTheme');
+		selectOceanTheme.innerHTML = MapSettings.OceanThemes
+				.map((oceanTheme, i) => `<option value="${oceanTheme.theme}" ${oceanTheme.theme === mapSettings.oceanTheme ? 'selected' : ''}>${oceanTheme.title}</option>`
+				).join('\n');
+
+		//Show the dialogue
+		minecordApp.setttingsDialogContainer.classList.add('visible');
+	}
+}
+
+/**
+ * Save settings button event
+ * @param {Event} evt Click event for settings saving
+ */
+function onSaveSettings(evt) {
+	//Don't do anything if we already have a dialog visible
+	if(isDialogueVisible()){
+		const mapSettings = minecordApp.mapSettings;
+
+		//----Get the values from the menu items----
+		
+		//Get all the input fields
+		mapSettings.title = document.getElementById('settingTitleEdit').value;
+		mapSettings.blurb = document.getElementById('settingBlurbEdit').value;
+		mapSettings.range = +document.getElementById('settingRangeEdit').value;
+		mapSettings.origin.x = +document.getElementById('originXCord').value;
+		mapSettings.origin.z = +document.getElementById('originZCord').value;
+		mapSettings.showOrigin = document.getElementById('settingShowOriginCheck').checked;
+		mapSettings.showScale = document.getElementById('settingShowScaleCheck').checked;
+		mapSettings.showCoordinates = document.getElementById('settingShowCoordinatesCheck').value;
+		mapSettings.hideLabelsAbove = +document.getElementById('settingHideLabelAboveEdit').value;
+		mapSettings.showLabelsBelow = +document.getElementById('settingShowLabelBelowEdit').value;
+
+		//Handle the url choosers
+		const customUrlInput = document.getElementById('settingCustomIconUrlEdit');
+		mapSettings.customIconFile = customUrlInput.value;
+		mapSettings.customIconMeta = customUrlInput.dataset["dropbox"] ? JSON.parse(customUrlInput.dataset["dropbox"]) : null;
+		
+		const oceanSrcInput = document.getElementById('settingOceanSrcEdit');
+		mapSettings.oceanSrc = oceanSrcInput.value;
+		mapSettings.oceanSrcMeta = oceanSrcInput.dataset["dropbox"] ? JSON.parse(oceanSrcInput.dataset["dropbox"]) : null;
+	
+		//Get the icon dropdown
+		const selectTheme = document.getElementById('selectOceanTheme');
+		const selectedTheme = selectTheme.options[selectTheme.selectedIndex];
+		mapSettings.oceanTheme = selectedTheme.value;
+
+		//Save to local storage
+		mapSettings.saveToStorage();
+
+		//Update the card
+		onUpdatedMapSettings();
+
+		//Hide the dialogue
+		minecordApp.setttingsDialogContainer.classList.remove('visible');
+	}
 }
 
 function loadLocationTypes(){
@@ -866,6 +986,13 @@ function init() {
 	//Get the map settings
 	minecordApp.mapSettings = MapSettings.loadFromStorage();
 	onUpdatedMapSettings();
+	const settingsCard = document.getElementById("mapSettings");
+	settingsCard.querySelector(".edit-item").addEventListener('click', promptEditSettings);
+	document.getElementById('settingsDialogSaveBtn').addEventListener('click', onSaveSettings);
+	document.getElementById('settingsDialogCancelBtn').addEventListener('click', (event) => {
+		//Close the menu
+		minecordApp.setttingsDialogContainer.classList.remove('visible');
+	});
 
 	//add all our cards
 	updateData();

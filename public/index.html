@@ -65,7 +65,10 @@
 		</div>
 
 		<div id="mapSettings" class="item-card settings">
-			<div class="setting-title"></div>
+			<div class="setting-group top">
+				<div class="setting-title"></div>
+				<button class="edit-item btn"><span>Edit</span></button>
+			</div>
 			<div class="setting-blurb"></div>
 			<div class="setting-range"></div>
 			<div class="setting-group">
@@ -75,6 +78,7 @@
 			<div class="setting-show-scale"></div>
 			<div class="setting-show-coordinates"></div>
 			<div class="setting-hide-label-above"></div>
+			<div class="setting-show-label-below"></div>
 			<div class="setting-custom-icon-file">
 				<div class="image-path"></div>
 				<figure>
@@ -82,6 +86,14 @@
 					<figcaption></figcaption>
 				</figure>
 			</div>
+			<div class="setting-ocean-src">
+				<div class="image-path"></div>
+				<figure>
+					<img src="" alt="">
+					<figcaption></figcaption>
+				</figure>
+			</div>
+			<div class="setting-ocean-theme"></div>
 		</div>
 
 		<div id="pageSpinner">
@@ -130,7 +142,58 @@
 		</div>
 	</main>
 
-	<div id="addDialogContainer">
+	<div id="setttingsDialogContainer" class="dialog-container">
+		<div class="dialog">
+			<div class="dialog-title">Edit Map Settings</div>
+			<div class="dialog-body">
+				<input id="settingTitleEdit" name="settingTitleEdit" type="text" placeholder="Title">
+				<textarea id="settingBlurbEdit" name="settingBlurbEdit" placeholder="Blurb" title="Blurb" rows="2" cols="30"></textarea>
+				<div class="label-group">
+					<label for="settingRangeEdit">Map Range</label>
+					<input type="number" id="settingRangeEdit" name="settingRangeEdit" placeholder="Range" title="Range" step="32">
+				</div>
+				<div class="coord-group">
+					<label>Origin</label>
+					<input type="number" id="originXCord" name="originXCord" placeholder="X" title="X">
+					<input type="number" id="originZCord" name="originZCord" placeholder="Z" title="Z">
+					<input type="checkbox" id="settingShowOriginCheck" name="settingShowOriginCheck" title="Show Origin">
+				</div>
+				<div class="label-group">
+					<label for="settingShowScaleCheck">Show Scale</label>
+					<input type="checkbox" id="settingShowScaleCheck" name="settingShowScaleCheck" title="Show Scale">
+				</div>
+				<div class="label-group">
+					<label for="settingShowCoordinatesCheck">Show Coordinates</label>
+					<input type="checkbox" id="settingShowCoordinatesCheck" name="settingShowCoordinatesCheck" title="Show Coordinates">
+				</div>
+				<div class="label-group">
+					<label for="settingHideLabelAboveEdit">Hide Above</label>
+					<input type="number" id="settingHideLabelAboveEdit" name="settingHideLabelAboveEdit" placeholder="Hide Above" title="Hide Label Above (zoom level)">
+				</div>
+				<div class="label-group">
+					<label for="settingShowLabelBelowEdit">Show Below</label>
+					<input type="number" id="settingShowLabelBelowEdit" name="settingShowLabelBelowEdit" placeholder="Show Above" title="Show Label Below (zoom level)">
+				</div>
+				<div class="chooser-group">
+					<input type="url" id="settingCustomIconUrlEdit" name="settingCustomIconUrlEdit" placeholder="Custom Icons url" title="Custom icon map url">
+					<button id="settingCustomIconUrlDropboxBtn" class="btn"><span>Dropbox</span></button>
+				</div>
+				<div class="chooser-group">
+					<input type="url" id="settingOceanSrcEdit" name="settingOceanSrcEdit" placeholder="Ocean Source Url" title="Custom ocean map url">
+					<button id="settingOceanSrcDropboxBtn" class="btn"><span>Dropbox</span></button>
+				</div>
+				<select id="selectOceanTheme" aria-label="Ocean Theme"
+					title="Ocean Theme/Style to use when drawing the map">
+				</select>
+			</div>
+			<div class="dialog-buttons">
+				<button id="settingsDialogCancelBtn" class="button">Cancel</button>
+				<button id="settingsDialogSaveBtn" class="button">Save</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="addDialogContainer" class="dialog-container">
 		<div class="dialog">
 			<div class="dialog-title">Add New Coordinate</div>
 			<div id="editLocationKey" hidden></div>

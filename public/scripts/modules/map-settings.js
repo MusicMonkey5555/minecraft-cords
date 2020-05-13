@@ -4,6 +4,18 @@ export default class MapSettings extends Storable {
 	//Static properties
 	static storageLocation = "mapSettings";
 
+	/**
+	 * Ocean them possible options
+	 */
+	static OceanThemes = [
+		{theme: "bluecoastline", title: "Blue Coastline" },
+		{theme: "bluecoastlinehard", title: "Blue Coastline Hard" },
+		{theme: "coastalrelief", title: "Coastal Relief" },
+		{theme: "coastalreliefhard", title: "Coastal Relief Hard" },
+		{theme: "darkseas", title: "Dark Seas" },
+		{theme: "darkseashard", title: "Dark Seas Hard" },
+	]
+
 	//Properties
 	/**
 	 * Title of our location list. This is used for {@link http://buildingwithblocks.info/index_expanded.html#settings_title_heading|Map title} on Pen and Paper.
@@ -49,19 +61,36 @@ export default class MapSettings extends Storable {
 	 */
 	hideLabelsAbove = 0;
 	/**
+	 * Specifies the zoom level at which all labels will be displayed, even if they overlap other labels or icons
+	 * (labels are normally only displayed when then don't overlap other items in the map)
+	 * @see {@link http://buildingwithblocks.info/index_expanded.html#settings_showlabels_heading|showlabelsbelow}
+	 */
+	showLabelsBelow = 3;
+	/**
 	 * Custom icon file to use for any custom icons (remember that any icon-indexes will begin at 64)
 	 * @see {@link http://buildingwithblocks.info/index_expanded.html#settings_icons_heading|icons}
 	 */
 	customIconFile = null;
+	/**
+	 * Meta data for custom icon like dropbox data
+	 */
+	customIconMeta = null;
+	/**
+	 * Use this if you ant your map to show oceans. This is where it will get the ocean map/mask file from
+	 * @see {@link http://buildingwithblocks.info/index_expanded.html#settings_oceansrc_heading|oceansrc}
+	 */
+	oceanSrc = null;
+	/**
+	 * Meta data for ocean source like dropbox data
+	 */
+	oceanSrcMeta = null;
+	/**
+	 * Selects the style in which to draw oceans on the map
+	 * @see {@link http://buildingwithblocks.info/index_expanded.html#settings_oceantheme_heading|oceantheme}
+	 */
+	oceanTheme = "bluecoastline";
 
 	// Methods
-	/**
-	 * Save this object to local storage using the @see storageLocation
-	 * If storage location is empty then don't save it
-	 */
-	saveToStorage(){
-		MapSettings.saveToStorage(this);
-	}
 
 	// Static Methods
 	/**

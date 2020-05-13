@@ -613,10 +613,10 @@ body {
 }
 
 /**
- * Add dialog
+ * Dialog
  */
 
-#addDialogContainer {
+.dialog-container {
 	background: rgba(0, 0, 0, 0.57);
 	height: 100%;
 	left: 0;
@@ -629,7 +629,7 @@ body {
 	will-change: opacity;
 }
 
-#addDialogContainer.visible {
+.dialog-container.visible {
 	opacity: 1;
 	pointer-events: auto;
 }
@@ -684,7 +684,9 @@ body {
 input,
 textarea {
 	width: 100%;
-	padding-bottom: 5px;
+	padding-bottom: 2px;
+	padding-top: 2px;
+	margin-bottom: 5px;
 }
 
 .chooser-group {
@@ -696,16 +698,43 @@ textarea {
 .chooser-group input {
 	order: 1;
 	width: 75%;
+	margin: auto;
 }
 .chooser-group button {
 	order: 2;
-	width: 25%;
 }
 
 .select-group,
-.coord-group {
+.coord-group,
+.label-group {
 	width: 100%;
 	display: flex;
+}
+
+.coord-group,
+.label-group {
+	padding-bottom: 5px;
+	align-items: center;
+}
+
+.label-group {
+	justify-content: space-between;
+}
+
+.label-group label {
+	padding-bottom: 5px;
+	padding-right: 10px;
+	width: 35%;
+	flex-grow: 1;
+}
+
+.label-group input[type=number] {
+	width: 65%;
+	flex-grow: 2;
+}
+
+.label-group input[type=checkbox] {
+	width:auto;
 }
 
 .select-group .icon-outer-wrapper {
@@ -716,6 +745,15 @@ textarea {
 	order: 2;
 	align-self: center;
 	margin-left: 5px;
+}
+
+.coord-group label {
+	padding-bottom: 5px;
+	padding-right: 10px;
+}
+
+.coord-group input[type=checkbox]{
+	width: auto;
 }
 
 .coord-group input {
@@ -884,13 +922,11 @@ textarea {
 	width: 100%;
 }
 
-.item-card .settings {
-	display: inline-flex;
-	width:100%;
+.item-card.settings {
 	font-size: 1.25em;
 }
 
-.item-card .settings .setting-group {
+.item-card.settings .setting-group {
 	display: inline-flex;
 	width:100%;
 	flex-direction: row;
@@ -899,11 +935,26 @@ textarea {
 	flex-wrap: nowrap;
 }
 
-.item-card .settings .setting-group .setting-origin {
+.item-card.settings .setting-group .setting-origin {
 	order: 1;
 }
 
-.item-card .settings .setting-group .setting-show-origin {
+.item-card.settings .setting-group .setting-show-origin {
+	order: 2;
+	padding-left: 10px;
+}
+
+.item-card.settings .setting-group.top {
+	justify-content: space-between;
+}
+
+.item-card.settings .setting-title {
+	order: 1;
+	flex-grow: 2;
+	font-size: 1.75em;
+}
+
+.item-card.settings .edit-item {
 	order: 2;
 }
 
