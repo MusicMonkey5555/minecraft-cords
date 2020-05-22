@@ -224,36 +224,26 @@ function checkCoordinates(event){
 	const loc = new MinecordLocation("", xCord.value, yCord.value, zCord.value);
 	const key = loc.getKey();
 	const hasKey = minecordApp.selectedLocations.hasKey(key);
-	//Adding warn about overritting an existing value
-	if(existingKey === ""){
-		if(hasKey){
-			cordError.textContent = "Coordinates match existing record, will over-write existing record.";
-			cordError.classList.add('visible');
+	var validityMsg = "";
+	//Set validity message based on if there is a coordinate collision
+	if(hasKey){
+		if(existingKey === ""){
+			validityMsg = "Coordinates match existing record, will over-write existing record.";
 		}
-		else
-		{
-			cordError.textContent = "";
-			cordError.classList.remove('visible');
+		else if(existingKey !== key){
+			validityMsg = "Coordinates have changed to another record, will over-write that one instead.";
 		}
 	}
-	else
-	{
-		if(hasKey){
-			if(existingKey !== key){
-				cordError.textContent = "Coordinates have changed to another record, will over-write that one instead.";
-				cordError.classList.add('visible');
-			}
-			else
-			{
-				cordError.textContent = "";
-				cordError.classList.remove('visible');
-			}
-		}
-		else
-		{
-			cordError.textContent = "";
-			cordError.classList.remove('visible');
-		}
+
+	//Check if we have a message and set the controls
+	cordError.textContent = validityMsg;
+	xCord.setCustomValidity(validityMsg);
+	yCord.setCustomValidity(validityMsg);
+	zCord.setCustomValidity(validityMsg);
+	if(validityMsg === ""){
+		cordError.classList.remove('visible');
+	} else {
+		cordError.classList.add('visible');
 	}
 }
 

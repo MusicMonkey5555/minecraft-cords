@@ -756,6 +756,10 @@ textarea {
 	width: auto;
 }
 
+.coord-group input:invalid {
+	outline-color: red;
+}
+
 .coord-group input {
 	align-self: center;
 	justify-content: space-evenly;
