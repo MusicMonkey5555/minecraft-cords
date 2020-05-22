@@ -962,6 +962,23 @@ function updateData() {
 }
 
 /**
+ * Use for an input field where only number should be entered and the user hits comma to swtich to next item in group
+ * @param {InputEvent} event 
+ */
+function onInputCommaSeperatedFields(event){
+	const ctrl = event.srcElement;
+	const nextInput = event.srcElement.nextElementSibling;
+	if(event.inputType === "insertText" && ((ctrl.value.includes(".") && event.data === ".") || event.data === ",")){
+		nextInput.focus();
+		
+		//Cancel the input if we can
+		if(event.cancelable){
+			event.preventDefault();
+		}
+	}
+}
+
+/**
  * Initialize the app, gets the list of locations from local storage, then
  * renders the initial data.
  */
@@ -983,6 +1000,8 @@ function init() {
 		//Close the menu
 		minecordApp.setttingsDialogContainer.classList.remove('visible');
 	});
+	document.getElementById('originXCord').addEventListener("beforeinput", onInputCommaSeperatedFields);
+	document.getElementById('originZCord').addEventListener("beforeinput", onInputCommaSeperatedFields);
 
 	//add all our cards
 	updateData();
@@ -1040,8 +1059,11 @@ function init() {
 		updateIconWrapper(iconDiv);
 	});
 	document.getElementById("xCord").addEventListener("input", checkCoordinates);
+	document.getElementById("xCord").addEventListener("beforeinput", onInputCommaSeperatedFields);
 	document.getElementById("yCord").addEventListener("input", checkCoordinates);
+	document.getElementById("yCord").addEventListener("beforeinput", onInputCommaSeperatedFields);
 	document.getElementById("zCord").addEventListener("input", checkCoordinates);
+	document.getElementById("zCord").addEventListener("beforeinput", onInputCommaSeperatedFields);
 }
 
 init();
