@@ -85,6 +85,27 @@ export default class MinecordLocation extends BaseClass {
 		return this.x + "|" + this.y + "|" + this.z;
 	}
 
+	/**
+	 * Has the minimum data for The Ink & Parchment
+	 * @see {@link http://buildingwithblocks.info/#locationColumns|Locations}
+	 */
+	hasLocationFileMinimum(){
+		return !((this.type || "") === "" || this.x === null || this.z === null);
+	}
+
+	/**
+	 * Get the data for this location in the format for the location file used on The Ink & Parchment
+	 * @see {@link http://buildingwithblocks.info/#LocationListFormat|Making a location list file}
+	 */
+	getLocationFileLine(){
+		if(this.hasLocationFileMinimum()) {
+			return (this.type || "") + "," + this.x + "," + this.z + "," + (this.description || "") + "," + (this.owner || "") + "," + (this.url || "") + "," + (this.iconIndex || "");
+		}
+		else{
+			return "";
+		}
+	}
+
 	// Static Methods
 	/**
 	 * This is used to create an object from a generic object that we don't know what version it was from.
@@ -111,6 +132,6 @@ export default class MinecordLocation extends BaseClass {
 	 * @param {Any} obj Object to check (non-object will fail)
 	 */
 	static hasMinimum(obj) {
-		return (obj && typeof obj === 'object' && obj.x && obj.y && obj.z);
+		return (obj && typeof obj === 'object' && obj.x && obj.y && obj.z && obj.type);
 	}
 }

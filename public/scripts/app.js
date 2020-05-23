@@ -862,36 +862,96 @@ function onSaveSettings(evt) {
 
 function saveToDropbox(){
 	if(minecordApp.filename.length > 0){
-		var fileUrl = getSaveJsonUrl();
-		Dropbox.save(fileUrl, minecordApp.filename, {
+		//Get the ui for this
+		const progressBar = document.getElementById("saveProgress");
+		const lastSavedDiv = document.getElementById("lastSavedTime");
+		progressBar.style.display = "block";
+
+		//Get the data to save
+		const jsonUrl = getJsonDataUrl();
+		const txtUrl = getTxtDataUrl();
+
+		//Save it to dropbox
+		Dropbox.save({
+			files: [
+				{'url': jsonUrl, 'filename': minecordApp.filename + ".json"},
+				{'url': txtUrl, 'filename': minecordApp.filename + ".txt"}
+			],
 			success: function(){
-				alert("File Saved!");
+				progressBar.style.display = "none";
+				const ms = Date.now();
+				lastSavedDiv.dataset["ms"] = ms;
+				const timestamp = luxon.DateTime
+					.fromMillis(ms)
+					.toFormat('D tt');
+				lastSavedDiv.innerText = "Saved " + timestamp;
+				lastSavedDiv.style.display = "block";
 			},
 			progress: function(progress){
-				console.log(progress);
+				progressBar.value = progress;
 			},
-			cancel: function(){},
+			cancel: function(){
+				progressBar.style.display = "none";
+			},
 			error: function(errorMessage){
+				progressBar.style.display = "none";
 				alert("Error saving file: " + errorMessage);
 			}
 		});
 	}
 }
 
-function saveCSV(){
-	var data = [""];
+function getTxtDataUrl(){
+	var data = [
+		"// Map settings:",
+		"// ============="
+	];
+	//Add all the settings to the file
+	for(const property in minecordApp.mapSettings){
+		if(property === "customIconFile" || property === "oceanSrc"){
 
+		} else if(property === "customIconMeta" || property === "oceanSrcMeta"){
+			//Ignore these
+		} else if(property === "origin"){
+			var origin = minecordApp.mapSettings[property];
+			data.push("x = " + origin.x);
+			data.push("z = " + origin.z);
+		}
+		else{
+			data.push(property.toLowerCase() + " = " + minecordApp.mapSettings[property]);
+		}
+	}
+
+	//Add all the locations
+	data.push(
+		"",
+		"",
+		"// Map locations:",
+		"// ==============",
+		"//",
+		"// Format:",
+		"// Type,x,z,Description,Owner,href,IconIndex",
+		""
+	);
+	for(const property in minecordApp.selectedLocations){
+		/**@type {MinecordLocation} */
+		const coord = minecordApp.selectedLocations[property];
+		if(coord.hasLocationFileMinimum()){
+			data.push(coord.getLocationFileLine());
+		}
+	}
+
+	return "data:text/plain," + encodeURIComponent(data.join("\n"));
 }
 
-function getSaveJsonUrl(){
+function getJsonDataUrl(){
 	var obj = {
 		mapSettings: minecordApp.mapSettings,
 		selectedLocations: minecordApp.selectedLocations,
 		owners: minecordApp.owners
 	};
-
-	var fileUrl = URL.createObjectURL(new Blob(JSON.stringify(obj), {type: 'application/json'}));
-	return fileUrl;
+	var json = JSON.stringify(obj, null, "\t");
+	return "data:application/json," + encodeURIComponent(json);
 }
 
 function loadLocationTypes(){
@@ -1030,7 +1090,7 @@ function init() {
 	//Get the map settings
 	minecordApp.mapSettings = MapSettings.loadFromStorage();
 	//Update filename
-	minecordApp.filename = mapSettings.title.length > 0 ? mapSettings.title.replace(/[\/|\\:*?"<>]/g, " ") : "";
+	minecordApp.filename = minecordApp.mapSettings.title.length > 0 ? minecordApp.mapSettings.title.replace(/[\/|\\:*?"<>]/g, " ") : "";
 	onUpdatedMapSettings();
 	const settingsCard = document.getElementById("mapSettings");
 	settingsCard.querySelector(".edit-item").addEventListener('click', promptEditSettings);

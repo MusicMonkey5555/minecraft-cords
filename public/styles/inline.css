@@ -107,7 +107,18 @@ body {
 
 .header #btnSave {
 	background: url(/images/save.svg) center center no-repeat;
-	background-color: white;
+	background-size: 125%;
+}
+
+.header #lastSavedTime{
+	font-size: small;
+	padding-right: 10px;
+	width: 150px;
+	text-align: center;
+}
+
+.header #saveProgress {
+	width: 150px;
 }
 
 
