@@ -828,7 +828,7 @@ function onSaveSettings(evt) {
 		mapSettings.origin.z = +document.getElementById('originZCord').value;
 		mapSettings.showOrigin = document.getElementById('settingShowOriginCheck').checked;
 		mapSettings.showScale = document.getElementById('settingShowScaleCheck').checked;
-		mapSettings.showCoordinates = document.getElementById('settingShowCoordinatesCheck').value;
+		mapSettings.showCoordinates = document.getElementById('settingShowCoordinatesCheck').checked;
 		mapSettings.hideLabelsAbove = +document.getElementById('settingHideLabelAboveEdit').value;
 		mapSettings.showLabelsBelow = +document.getElementById('settingShowLabelBelowEdit').value;
 
