@@ -105,6 +105,12 @@ body {
 	background: url(/images/install.svg) center center no-repeat;
 }
 
+.header #btnSave {
+	background: url(/images/save.svg) center center no-repeat;
+	background-color: white;
+}
+
+
 .header .powered-by {
 	color: white;
 	font-size: 0.6em;

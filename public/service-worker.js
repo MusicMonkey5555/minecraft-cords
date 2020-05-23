@@ -18,7 +18,7 @@
 'use strict';
 
 // Update cache names any time any of the cached files change.
-const CACHE_NAME = 'static-cache-v6';
+const CACHE_NAME = 'static-cache-v7';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
 // Add list of files to cache here.
@@ -40,6 +40,7 @@ const FILES_TO_CACHE = [
 	'/images/add.svg',
 	'/images/install.svg',
 	'/images/refresh.svg',
+	'/images/save.svg',
 	'/images/favicon.ico',
 	'/images/glyphs.png',
 	'/data/IconClasses.json',

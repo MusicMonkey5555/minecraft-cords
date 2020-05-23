@@ -846,6 +846,9 @@ function onSaveSettings(evt) {
 		const selectedTheme = selectTheme.options[selectTheme.selectedIndex];
 		mapSettings.oceanTheme = selectedTheme.value;
 
+		//Update filename
+		minecordApp.filename = mapSettings.title.length > 0 ? mapSettings.title.replace(/[\/|\\:*?"<>]/g, " ") : "";
+
 		//Save to local storage
 		mapSettings.saveToStorage();
 
@@ -855,6 +858,40 @@ function onSaveSettings(evt) {
 		//Hide the dialogue
 		minecordApp.setttingsDialogContainer.classList.remove('visible');
 	}
+}
+
+function saveToDropbox(){
+	if(minecordApp.filename.length > 0){
+		var fileUrl = getSaveJsonUrl();
+		Dropbox.save(fileUrl, minecordApp.filename, {
+			success: function(){
+				alert("File Saved!");
+			},
+			progress: function(progress){
+				console.log(progress);
+			},
+			cancel: function(){},
+			error: function(errorMessage){
+				alert("Error saving file: " + errorMessage);
+			}
+		});
+	}
+}
+
+function saveCSV(){
+	var data = [""];
+
+}
+
+function getSaveJsonUrl(){
+	var obj = {
+		mapSettings: minecordApp.mapSettings,
+		selectedLocations: minecordApp.selectedLocations,
+		owners: minecordApp.owners
+	};
+
+	var fileUrl = URL.createObjectURL(new Blob(JSON.stringify(obj), {type: 'application/json'}));
+	return fileUrl;
 }
 
 function loadLocationTypes(){
@@ -992,6 +1029,8 @@ function init() {
 
 	//Get the map settings
 	minecordApp.mapSettings = MapSettings.loadFromStorage();
+	//Update filename
+	minecordApp.filename = mapSettings.title.length > 0 ? mapSettings.title.replace(/[\/|\\:*?"<>]/g, " ") : "";
 	onUpdatedMapSettings();
 	const settingsCard = document.getElementById("mapSettings");
 	settingsCard.querySelector(".edit-item").addEventListener('click', promptEditSettings);
@@ -1021,6 +1060,7 @@ function init() {
 		//Close the menu
 		minecordApp.addDialogContainer.classList.remove('visible');
 	});
+	document.getElementById('btnSave').addEventListener('click', saveToDropbox);
 
 	document.getElementById('url-from-dropbox').addEventListener('click', (event) => {
 		if(Dropbox){
